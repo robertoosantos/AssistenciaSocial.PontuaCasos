@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
 public class Usuario
 {
