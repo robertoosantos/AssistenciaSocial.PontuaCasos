@@ -3,6 +3,7 @@ using System;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     [DbContext(typeof(PontuaCasosContext))]
-    partial class PontuaCasosContextModelSnapshot : ModelSnapshot
+    [Migration("20220812221837_TratamentoNulosUsuarios")]
+    partial class TratamentoNulosUsuarios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
