@@ -17,7 +17,7 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 ENV Database=/workspaces/AssistenciaSocial.PontuaCasos/src/AssistenciaSocial.PontuaCasos.WebApp/Database/pontuacasos_dev.db
 
 # dotnet tools
-RUN dotnet tool install --global dotnet-ef
+RUN dotnet tool install -g dotnet-ef
 RUN dotnet tool install -g dotnet-aspnet-codegenerator
 
-ENV PATH="${PATH}:/root/.dotnet/tools"
+ENV PATH="${PATH}:/home/vscode/.dotnet/tools"
