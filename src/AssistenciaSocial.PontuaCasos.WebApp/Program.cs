@@ -9,7 +9,7 @@ builder.Services.AddControllersWithViews();
 Console.WriteLine("Database : " + builder.Configuration["Database"]);
 
 builder.Services.AddDbContext<PontuaCasosContext>(options =>
-    options.UseSqlite(builder.Configuration["Database"]));
+    options.UseSqlite($"Data Source={builder.Configuration["Database"]}"));
 
 var app = builder.Build();
 
