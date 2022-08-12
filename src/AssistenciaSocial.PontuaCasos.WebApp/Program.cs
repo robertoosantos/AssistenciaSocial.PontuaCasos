@@ -1,9 +1,18 @@
+using AssistenciaSocial.PontuaCasos.WebApp.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+Console.WriteLine("Database : " + builder.Configuration["Database"]);
+
+builder.Services.AddDbContext<PontuaCasosContext>(options =>
+    options.UseSqlite(builder.Configuration["Database"]));
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
