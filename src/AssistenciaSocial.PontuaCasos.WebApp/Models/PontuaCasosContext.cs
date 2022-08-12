@@ -13,4 +13,46 @@ public class PontuaCasosContext : DbContext
     {
 
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.CriadoPor)
+            .WithMany();
+
+        modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.ModificadoPor)
+            .WithMany();
+
+        modelBuilder.Entity<Organizacao>()
+        .HasOne(o => o.CriadoPor)
+        .WithMany();
+
+        modelBuilder.Entity<Organizacao>()
+        .HasOne(o => o.ModificadoPor)
+        .WithMany();
+
+        modelBuilder.Entity<Organizacao>()
+            .HasMany(o => o.Administradores)
+            .WithOne();
+
+        modelBuilder.Entity<Usuario>()
+            .HasMany(u => u.Organizacoes)
+            .WithMany(o => o.Membros)
+            .UsingEntity<Dictionary<string, object>>(
+                "MembrosOrganizacao",
+                mo => mo
+                .HasOne<Organizacao>()
+                .WithMany()
+                .HasForeignKey("OrganizacaoId")
+                .HasConstraintName("FK_MembrosOrganizacao_Organizacoes_OrganizacaoId")
+                .OnDelete(DeleteBehavior.Cascade),
+                mo => mo
+                .HasOne<Usuario>()
+                .WithMany()
+                .HasForeignKey("UsuarioId")
+                .HasConstraintName("FK_MembrosOrganizacao_Usuarios_UsuarioId")
+                .OnDelete(DeleteBehavior.Cascade)
+            );
+    }
 }
