@@ -1,0 +1,7 @@
+version: 1
+
+pre-build: | 
+    dotnet tool install -g dotnet-ef
+  
+post-build: | 
+    dotnet ef database update
