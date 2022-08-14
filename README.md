@@ -1,3 +1,3 @@
 # AssistenciaSocial.PontuaCasos
 
-v.0.0.1.b
+v.0.0.1.d
