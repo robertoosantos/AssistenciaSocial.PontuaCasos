@@ -15,11 +15,15 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Azure subscription 1(fbb97c5c-09ae-4eb5-98e3-c4cfe9b5b4e6)'
     appType: 'webAppLinux'
     appName: 'pontuacasos'
     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-    runtimeStack: 'DOTNETCORE|6.0'
