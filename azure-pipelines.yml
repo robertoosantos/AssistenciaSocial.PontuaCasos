@@ -15,7 +15,7 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build /robertoosantos/AssistenciaSocial.PontuaCasos/src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj --configuration $(buildConfiguration)
+- script: dotnet build src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 - task: DotNetCoreCLI@2
   inputs:
