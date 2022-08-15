@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/*.sln'
@@ -15,44 +15,15 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- checkout: self
-
-- task: NuGetToolInstaller@1
-
+- script: dotnet build src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
 - task: DotNetCoreCLI@2
-  displayName: New Manifest for tool
   inputs:
-    command: custom
-    custom: 'new '
-    arguments: tool-manifest
-
-- task: DotNetCoreCLI@2
-  displayName: Install EF Tool
+    command: 'publish'
+    publishWebProjects: true
+- task: AzureWebApp@1
   inputs:
-    command: custom
-    custom: 'tool '
-    arguments: install dotnet-ef
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: Database Update
-  inputs:
-    command: custom
-    custom: 'ef '
-    arguments: database update
-
+    azureSubscription: 'Azure subscription 1(fbb97c5c-09ae-4eb5-98e3-c4cfe9b5b4e6)'
+    appType: 'webAppLinux'
+    appName: 'pontuacasos'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
