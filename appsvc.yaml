@@ -1,4 +1,4 @@
-version: 3
+version: 4
 
 pre-build: | 
     export PATH="$PATH:/home/.dotnet/tools"
