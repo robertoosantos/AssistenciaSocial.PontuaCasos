@@ -27,17 +27,3 @@ steps:
     appType: 'webAppLinux'
     appName: 'pontuacasos'
     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-
-- task: DotNetCoreCLI@2
-  displayName: Install EF Tool
-  inputs:
-    command: custom
-    custom: 'tool '
-    arguments: install -g dotnet-ef
-
-- task: DotNetCoreCLI@2
-  displayName: Database Migration
-  inputs:
-    command: custom
-    custom: 'ef '
-    arguments: database update --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
