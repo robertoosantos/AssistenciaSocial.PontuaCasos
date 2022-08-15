@@ -1,8 +1,9 @@
-version: 5
+version: 6
 
 pre-build: | 
     export PATH="$PATH:/home/.dotnet/tools"
   
 post-build: |
     dotnet --list-sdks
+    echo $DOTNET_ROOT
     dotnet ef database update
