@@ -1,9 +1,9 @@
-version: 6
+version: 7
 
 pre-build: | 
     export PATH="$PATH:/home/.dotnet/tools"
   
 post-build: |
-    dotnet --list-sdks
+    DOTNET_ROOT=/usr/share/dotnet/shared/Microsoft.NETCore.App/6.0.3
     echo $DOTNET_ROOT
     dotnet ef database update
