@@ -6,13 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-Console.WriteLine("Database : " + builder.Configuration["Database"]);
-
 builder.Services.AddDbContext<PontuaCasosContext>(options =>
     options.UseSqlite($"Data Source={builder.Configuration["Database"]}"));
 
 var app = builder.Build();
 
+// migrate any database changes on startup (includes initial db creation)
+using (var scope = app.Services.CreateScope())
+{
+    var dataContext = scope.ServiceProvider.GetRequiredService<PontuaCasosContext>();
+    dataContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
