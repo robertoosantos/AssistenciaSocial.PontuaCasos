@@ -40,4 +40,4 @@ steps:
   inputs:
     command: custom
     custom: 'ef '
-    arguments: database update
+    arguments: database update --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
