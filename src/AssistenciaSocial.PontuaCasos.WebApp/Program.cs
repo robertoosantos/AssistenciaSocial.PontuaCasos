@@ -9,6 +9,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<PontuaCasosContext>(options =>
     options.UseSqlServer($"Server={builder.Configuration["DatabaseServer"]};Database={builder.Configuration["DatabaseName"]};User Id={builder.Configuration["DatabaseUser"]};Password={builder.Configuration["DatabasePassword"]};"));
 
+builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
@@ -19,6 +20,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Usuarios
+        [Authorize]
         public async Task<IActionResult> Index()
         {
               return _context.Usuarios != null ? 
