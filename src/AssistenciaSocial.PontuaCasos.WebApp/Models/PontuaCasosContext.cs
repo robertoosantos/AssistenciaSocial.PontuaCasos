@@ -1,12 +1,13 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
 
-public class PontuaCasosContext : DbContext
+public class PontuaCasosContext : IdentityDbContext<Usuario>
 {
     public DbSet<Organizacao> Organizacoes => Set<Organizacao>();
-    public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<Item> Itens => Set<Item>();
 
     public PontuaCasosContext(DbContextOptions<PontuaCasosContext> options) : base(options)
@@ -20,14 +21,6 @@ public class PontuaCasosContext : DbContext
             .HasOne(i => i.ModificadoPor)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
-
-        modelBuilder.Entity<Usuario>()
-            .HasOne(u => u.CriadoPor)
-            .WithMany();
-
-        modelBuilder.Entity<Usuario>()
-            .HasOne(u => u.ModificadoPor)
-            .WithMany();
 
         modelBuilder.Entity<Organizacao>()
             .HasOne(o => o.CriadoPor)
