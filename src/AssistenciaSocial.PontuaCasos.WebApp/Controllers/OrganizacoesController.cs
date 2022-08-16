@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
+    [Authorize]
     public class OrganizacoesController : Controller
     {
         private readonly PontuaCasosContext _context;
@@ -17,6 +19,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             _context = context;
         }
+
 
         // GET: Organizacoes
         public async Task<IActionResult> Index()

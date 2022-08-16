@@ -17,6 +17,8 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Item>()
             .HasOne(i => i.ModificadoPor)
             .WithMany()
