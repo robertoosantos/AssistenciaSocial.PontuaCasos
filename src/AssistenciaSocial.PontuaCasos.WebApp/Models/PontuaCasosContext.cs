@@ -16,6 +16,11 @@ public class PontuaCasosContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Item>()
+            .HasOne(i => i.ModificadoPor)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Usuario>()
             .HasOne(u => u.CriadoPor)
             .WithMany();
@@ -25,12 +30,15 @@ public class PontuaCasosContext : DbContext
             .WithMany();
 
         modelBuilder.Entity<Organizacao>()
-        .HasOne(o => o.CriadoPor)
-        .WithMany();
+            .HasOne(o => o.CriadoPor)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Organizacao>()
-        .HasOne(o => o.ModificadoPor)
-        .WithMany();
+            .HasOne(o => o.ModificadoPor)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
 
         modelBuilder.Entity<Organizacao>()
             .HasMany(o => o.Administradores)
