@@ -11,13 +11,6 @@ builder.Services.AddDbContext<PontuaCasosContext>(options =>
 
 var app = builder.Build();
 
-// migrate any database changes on startup (includes initial db creation)
-using (var scope = app.Services.CreateScope())
-{
-    var dataContext = scope.ServiceProvider.GetRequiredService<PontuaCasosContext>();
-    dataContext.Database.Migrate();
-}
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
