@@ -22,6 +22,13 @@ steps:
     custom: 'new '
     arguments: tool-manifest
 
+- task: DotNetCoreCLI@2
+  displayName: Install EF Tool
+  inputs:
+    command: custom
+    custom: 'tool '
+    arguments: install dotnet-ef
+
 - script: dotnet build src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 
@@ -36,13 +43,6 @@ steps:
     command: custom
     custom: 'ef '
     arguments: migrations script --output $(Build.SourcesDirectory)/SQL/pontuacasos.sql --idempotent --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
-
-- task: DotNetCoreCLI@2
-  displayName: Install EF Tool
-  inputs:
-    command: custom
-    custom: 'tool '
-    arguments: install dotnet-ef
 
 - task: AzureWebApp@1
   inputs:
