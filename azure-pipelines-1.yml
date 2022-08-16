@@ -42,7 +42,7 @@ steps:
   inputs:
     command: custom
     custom: 'ef '
-    arguments: migrations script --output $(Build.SourcesDirectory)/SQL/pontuacasos.sql --idempotent --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
+    arguments: migrations script --output $(Build.SourcesDirectory)\pontuacasos.sql --idempotent --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
 
 - task: AzureWebApp@1
   inputs:
@@ -54,7 +54,7 @@ steps:
 - task: SqlDacpacDeploymentOnMachineGroup@0
   inputs:
     TaskType: 'sqlQuery'
-    SqlFile: '$(Build.SourcesDirectory)/SQL/pontuacasos.sql'
+    SqlFile: '$(Build.SourcesDirectory)\pontuacasos.sql'
     ServerName: 'pontuacasos.mssql.somee.com'
     DatabaseName: 'pontuacasos'
     AuthScheme: 'sqlServerAuthentication'
