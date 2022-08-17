@@ -18,7 +18,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         modelBuilder.Entity<Item>()
             .HasOne(i => i.ModificadoPor)
             .WithMany()
@@ -38,6 +38,16 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Organizacao>()
             .HasMany(o => o.Administradores)
             .WithOne();
+
+        modelBuilder.Entity<Usuario>()
+            .HasMany<Item>()
+            .WithOne(i => i.ModificadoPor)
+            .HasForeignKey(i => i.ModificadoPorId);
+
+        modelBuilder.Entity<Usuario>()
+        .HasMany<Item>()
+        .WithOne(i => i.CriadoPor)
+        .HasForeignKey(i => i.CriadoPorId);
 
         modelBuilder.Entity<Usuario>()
             .HasMany(u => u.Organizacoes)

@@ -4,6 +4,7 @@ using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     [DbContext(typeof(PontuaCasosContext))]
-    partial class PontuaCasosContextModelSnapshot : ModelSnapshot
+    [Migration("20220817125635_VeTipoCategoria")]
+    partial class VeTipoCategoria
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,7 +85,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CriadoPorId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("ItemId")
@@ -412,9 +413,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", "CriadoPor")
                         .WithMany()
-                        .HasForeignKey("CriadoPorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CriadoPorId");
 
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", null)
                         .WithMany("Itens")
