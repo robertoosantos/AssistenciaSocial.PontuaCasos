@@ -21,9 +21,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Categorias
         public async Task<IActionResult> Index()
         {
-              return _context.Itens != null ? 
-                          View(await _context.Itens.ToListAsync()) :
-                          Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
+            return _context.Itens != null ?
+                        View(await _context.Itens.ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
         }
 
         // GET: Categorias/Details/5
@@ -55,15 +55,30 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos,Ativo,Multiplo,CriadoEm,ModificadoEm")] Item item)
+        public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos")] Item item)
         {
-            if (ModelState.IsValid)
+
+            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+
+            item.Ativo = true;
+            item.CriadoEm = DateTime.Now;
+            item.ModificadoEm = DateTime.Now;
+            item.Categoria = true;
+            item.CriadoPorId = user.Id;
+            item.ModificadoPorId = user.Id;
+            item.ModificadoPor = user;
+            item.CriadoPor = user;
+            item.Organizacao = user.Organizacoes.FirstOrDefault();
+
+            ModelState.Clear();
+            if (!TryValidateModel(item, nameof(item)))
             {
-                _context.Add(item);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(item);
             }
-            return View(item);
+
+            _context.Add(item);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Categorias/Edit/5
@@ -149,14 +164,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 _context.Itens.Remove(item);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ItemExists(int id)
         {
-          return (_context.Itens?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Itens?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
