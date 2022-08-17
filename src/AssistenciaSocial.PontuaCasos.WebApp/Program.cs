@@ -13,6 +13,7 @@ builder.Services.AddDbContext<PontuaCasosContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<Usuario>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PontuaCasosContext>();
 
 builder.Services.AddAuthentication().AddGoogle(googleOptions =>
