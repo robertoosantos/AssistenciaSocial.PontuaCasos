@@ -24,9 +24,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Organizacoes
         public async Task<IActionResult> Index()
         {
-              return _context.Organizacoes != null ? 
-                          View(await _context.Organizacoes.ToListAsync()) :
-                          Problem("Entity set 'PontuaCasosContext.Organizacoes'  is null.");
+            return _context.Organizacoes != null ?
+                        View(await _context.Organizacoes.ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Organizacoes'  is null.");
         }
 
         // GET: Organizacoes/Details/5
@@ -58,15 +58,24 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,CriadoEm,ModificadoEm")] Organizacao organizacao)
+        public async Task<IActionResult> Create([Bind("Id,Nome")] Organizacao organizacao)
         {
-            if (ModelState.IsValid)
+            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+
+            organizacao.ModificadoEm = DateTime.Now;
+            organizacao.CriadoEm = organizacao.ModificadoEm;
+            organizacao.CriadoPor = user;
+            organizacao.ModificadoPor = user;
+
+            ModelState.Clear();
+            if (!TryValidateModel(organizacao, nameof(organizacao)))
             {
-                _context.Add(organizacao);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(organizacao);
             }
-            return View(organizacao);
+
+            _context.Add(organizacao);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Organizacoes/Edit/5
@@ -152,14 +161,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 _context.Organizacoes.Remove(organizacao);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool OrganizacaoExists(int id)
         {
-          return (_context.Organizacoes?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Organizacoes?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
