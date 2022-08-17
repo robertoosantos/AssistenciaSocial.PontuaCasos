@@ -57,8 +57,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos")] Item item)
         {
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
 
-            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            if (user.Organizacoes is not null)
+                item.Organizacao = user.Organizacoes.First();
 
             item.Ativo = true;
             item.CriadoEm = DateTime.Now;
@@ -66,9 +68,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             item.Categoria = true;
             item.CriadoPorId = user.Id;
             item.ModificadoPorId = user.Id;
-            item.ModificadoPor = user;
-            item.CriadoPor = user;
-            item.Organizacao = user.Organizacoes.FirstOrDefault();
 
             ModelState.Clear();
             if (!TryValidateModel(item, nameof(item)))

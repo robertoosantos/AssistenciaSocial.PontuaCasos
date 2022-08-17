@@ -24,6 +24,11 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
 
+        modelBuilder.Entity<Caso>()
+            .HasOne(c => c.ModificadoPor)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
         modelBuilder.Entity<Organizacao>()
             .HasOne(o => o.CriadoPor)
             .WithMany()
@@ -52,20 +57,6 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Usuario>()
             .HasMany(u => u.Organizacoes)
             .WithMany(o => o.Membros)
-            .UsingEntity<Dictionary<string, object>>(
-                "MembrosOrganizacao",
-                mo => mo
-                .HasOne<Organizacao>()
-                .WithMany()
-                .HasForeignKey("OrganizacaoId")
-                .HasConstraintName("FK_MembrosOrganizacao_Organizacoes_OrganizacaoId")
-                .OnDelete(DeleteBehavior.Cascade),
-                mo => mo
-                .HasOne<Usuario>()
-                .WithMany()
-                .HasForeignKey("UsuarioId")
-                .HasConstraintName("FK_MembrosOrganizacao_Usuarios_UsuarioId")
-                .OnDelete(DeleteBehavior.Cascade)
-            );
+            .UsingEntity(mo => mo.ToTable("MembrosOrganizacao"));
     }
 }
