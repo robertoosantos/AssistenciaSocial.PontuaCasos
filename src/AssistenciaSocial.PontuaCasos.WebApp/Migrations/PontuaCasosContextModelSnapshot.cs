@@ -433,7 +433,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .IsRequired();
 
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", "Organizacao")
-                        .WithMany()
+                        .WithMany("Itens")
                         .HasForeignKey("OrganizacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -550,6 +550,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
                 {
                     b.Navigation("Administradores");
+
+                    b.Navigation("Itens");
                 });
 #pragma warning restore 612, 618
         }

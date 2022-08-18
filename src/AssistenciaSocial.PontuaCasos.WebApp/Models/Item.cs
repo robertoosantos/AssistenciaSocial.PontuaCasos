@@ -9,6 +9,8 @@ public class Item : ModelBaseControle
     public bool Ativo { get; set; }
     public bool Multiplo { get; set; }
     public bool Categoria { get; set; }
-    public Organizacao Organizacao { get; set; } = null!;
+    public int OrganizacaoId { get; set; }
+    public Organizacao? Organizacao { get; set; }
+    public int? ItemId { get; set; }
     public List<Item>? Itens { get; set; }
 }
