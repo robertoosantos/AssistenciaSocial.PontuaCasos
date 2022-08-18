@@ -101,14 +101,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,CriadoEm,ModificadoEm")] Item item)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
         {
             if (id != item.Id)
             {
                 return NotFound();
             }
 
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => u.Email == User.Identity.Name);
             item.ModificadoEm = DateTime.Now;
             item.ModificadoPorId = user.Id;
 
@@ -165,7 +165,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var item = await _context.Itens.FindAsync(id);
             if (item != null)
             {
-                _context.Itens.Remove(item);
+                item.Ativo = false;
             }
 
             await _context.SaveChangesAsync();
