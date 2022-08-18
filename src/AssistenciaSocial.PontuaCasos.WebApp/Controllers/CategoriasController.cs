@@ -22,7 +22,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.Itens != null ?
-                        View(await _context.Itens.ToListAsync()) :
+                        View(await _context.Itens.Where(i => i.Categoria).ToListAsync()) :
                         Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
         }
 
@@ -34,7 +34,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return NotFound();
             }
 
-            var item = await _context.Itens
+            var item = await _context.Itens.Include(i => i.Itens)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (item == null)
             {
@@ -107,6 +107,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 return NotFound();
             }
+
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            item.ModificadoEm = DateTime.Now;
+            item.ModificadoPorId = user.Id;
 
             if (ModelState.IsValid)
             {
