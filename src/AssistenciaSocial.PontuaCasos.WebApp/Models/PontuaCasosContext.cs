@@ -44,6 +44,11 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .HasMany(o => o.Administradores)
             .WithOne();
 
+        modelBuilder.Entity<Organizacao>()
+            .HasMany(o => o.Itens)
+            .WithOne(i => i.Organizacao)
+            .HasForeignKey(i => i.OrganizacaoId);
+
         modelBuilder.Entity<Usuario>()
             .HasMany<Item>()
             .WithOne(i => i.ModificadoPor)
