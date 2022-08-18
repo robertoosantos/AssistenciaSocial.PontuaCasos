@@ -13,6 +13,13 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input asp-for="CriadoEm" type="hidden" />
+            <input asp-for="ModificadoEm" type="hidden" />
+            <input asp-for="CriadoPorId" type="hidden" />
+            <input asp-for="ModificadoPorId" type="hidden" />
+            <input asp-for="Categoria" type="hidden" />
+            <input asp-for="OrganizacaoId" type="hidden" />
+            <input asp-for="ItemId" type="hidden" />
             <div class="form-group">
                 <label asp-for="Titulo" class="control-label"></label>
                 <input asp-for="Titulo" class="form-control" />
@@ -33,31 +40,6 @@
                     <input class="form-check-input" asp-for="Multiplo" /> @Html.DisplayNameFor(model => model.Multiplo)
                 </label>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Categoria" /> @Html.DisplayNameFor(model => model.Categoria)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="CriadoEm" class="control-label"></label>
-                <input asp-for="CriadoEm" class="form-control" />
-                <span asp-validation-for="CriadoEm" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CriadoPorId" class="control-label"></label>
-                <select asp-for="CriadoPorId" class="form-control" asp-items="ViewBag.CriadoPorId"></select>
-                <span asp-validation-for="CriadoPorId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModificadoPorId" class="control-label"></label>
-                <select asp-for="ModificadoPorId" class="form-control" asp-items="ViewBag.ModificadoPorId"></select>
-                <span asp-validation-for="ModificadoPorId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModificadoEm" class="control-label"></label>
-                <input asp-for="ModificadoEm" class="form-control" />
-                <span asp-validation-for="ModificadoEm" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -66,6 +48,5 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a href="javascript:void(0);" onclick="history.go(-1);">Back to List</a>
 </div>
-

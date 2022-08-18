@@ -21,7 +21,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Itens
         public async Task<IActionResult> Index()
         {
-            var pontuaCasosContext = _context.Itens.Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
+            var pontuaCasosContext = _context.Itens.Where(i => !i.Categoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
             return View(await pontuaCasosContext.ToListAsync());
         }
 
@@ -58,17 +58,33 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm")] Item item)
+        public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,Multiplo")] Item item)
         {
-            if (ModelState.IsValid)
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+
+            if (user.Organizacoes is not null)
+                item.Organizacao = user.Organizacoes.First();
+
+            item.Ativo = true;
+            item.CriadoEm = DateTime.Now;
+            item.ModificadoEm = DateTime.Now;
+            item.Categoria = false;
+
+            if (categoria_id is not null)
+                item.ItemId = int.Parse(categoria_id);
+
+            item.CriadoPorId = user.Id;
+            item.ModificadoPorId = user.Id;
+
+            ModelState.Clear();
+            if (!TryValidateModel(item, nameof(item)) || item.ItemId is null)
             {
-                _context.Add(item);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(item);
             }
-            ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
-            ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);
-            return View(item);
+
+            _context.Add(item);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Categorias", new { id = categoria_id });
         }
 
         // GET: Itens/Edit/5
@@ -94,12 +110,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm")] Item item)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
         {
             if (id != item.Id)
             {
                 return NotFound();
             }
+
+            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            item.ModificadoEm = DateTime.Now;
+            item.ModificadoPorId = user.Id;
 
             if (ModelState.IsValid)
             {
@@ -119,7 +139,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Categorias", new { id = item.ItemId });
             }
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);
@@ -158,16 +178,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var item = await _context.Itens.FindAsync(id);
             if (item != null)
             {
-                _context.Itens.Remove(item);
+                item.Ativo = false;
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ItemExists(int id)
         {
-          return (_context.Itens?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Itens?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
