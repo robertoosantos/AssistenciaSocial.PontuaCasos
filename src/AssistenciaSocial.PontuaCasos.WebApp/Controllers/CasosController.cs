@@ -21,9 +21,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos
         public async Task<IActionResult> Index()
         {
-              return _context.Casos != null ? 
-                          View(await _context.Casos.ToListAsync()) :
-                          Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+            return _context.Casos != null ?
+                        View(await _context.Casos.ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
         }
 
         // GET: Casos/Details/5
@@ -35,6 +35,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var caso = await _context.Casos
+                .Include(c => c.Itens)
+                .ThenInclude(i => i.Itens)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (caso == null)
             {
@@ -47,6 +49,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Create
         public IActionResult Create()
         {
+            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && !i.Multiplo).ToList();
             return View();
         }
 
@@ -57,16 +60,58 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Pontos,Ativo")] Caso caso)
         {
+            var itens = new Dictionary<int, Item>();
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            int pontos = 0;
+
+            foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
+            {
+                var id = int.Parse(item.Value[0].Replace("itens_", ""));
+                var itemSelecionado = _context.Itens.FirstOrDefault(i => i.Id == id);
+
+                if (itemSelecionado != null && itemSelecionado.ItemId != null)
+                {
+                    Item? existe = null;
+
+                    if (itens.TryGetValue((int)itemSelecionado.ItemId, out existe))
+                    {
+                        if (existe.Itens != null)
+                        {
+                            existe.Itens.Add(itemSelecionado);
+                            pontos += existe.Pontos * itemSelecionado.Pontos;
+                        }
+                    }
+                    else
+                    {
+                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.ItemId);
+                        categoria.Itens = new List<Item>();
+                        categoria.Itens.Add(itemSelecionado);
+
+                        pontos += categoria.Pontos * itemSelecionado.Pontos;
+
+                        itens.Add((int)itemSelecionado.ItemId, categoria);
+                    }
+                }
+            }
+
             caso.CriadoEm = DateTime.Now;
             caso.ModificadoEm = caso.CriadoEm;
+            caso.CriadoPorId = user.Id;
+            caso.ModificadoPorId = user.Id;
+            caso.Pontos = pontos;
+            caso.Itens = itens.Values.ToList();
+            if (user.Organizacoes != null)
+                caso.Organizacao = user.Organizacoes.First();
 
-            if (ModelState.IsValid)
+            ModelState.Clear();
+            if (!TryValidateModel(caso, nameof(caso)))
             {
-                _context.Add(caso);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View(caso);
             }
-            return View(caso);
+
+            var novoCaso = _context.Add(caso);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details), new { id = novoCaso.Entity.Id });
         }
 
         // GET: Casos/Edit/5
@@ -152,14 +197,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 _context.Casos.Remove(caso);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CasoExists(int id)
         {
-          return (_context.Casos?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Casos?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

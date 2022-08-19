@@ -1,0 +1,23 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="fw-bold fs-5">
+                    @Html.DisplayFor(modelItem => item.Titulo)
+                </td>
+                @foreach (var subitem in item.Itens)
+                {
+                    <td>
+                        <label for="@subitem.Titulo" class="fw-light">@subitem.Titulo</label>
+                    </td>
+                    <td>
+                        <input class="me-5" id="@subitem.Id" type="checkbox" name="@subitem.Titulo" value="itens_@subitem.Id"/>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
