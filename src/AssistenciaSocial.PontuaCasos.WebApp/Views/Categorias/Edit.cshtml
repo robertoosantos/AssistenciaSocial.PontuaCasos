@@ -19,7 +19,6 @@
             <input asp-for="ModificadoPorId" type="hidden" />
             <input asp-for="Categoria" type="hidden" />
             <input asp-for="OrganizacaoId" type="hidden" />
-            <input asp-for="Multiplo" type="hidden" />
             <div class="form-group">
                 <label asp-for="Titulo" class="control-label"></label>
                 <input asp-for="Titulo" class="form-control" />
@@ -29,6 +28,11 @@
                 <label asp-for="Pontos" class="control-label"></label>
                 <input asp-for="Pontos" class="form-control" />
                 <span asp-validation-for="Pontos" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Multiplo" /> @Html.DisplayNameFor(model => model.Multiplo)
+                </label>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">

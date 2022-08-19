@@ -55,7 +55,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos")] Item item)
+        public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos,Multiplo")] Item item)
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
 
