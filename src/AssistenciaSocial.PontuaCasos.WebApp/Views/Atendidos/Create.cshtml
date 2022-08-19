@@ -1,0 +1,23 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Item</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-route-categoria_id="@Context.Request.Query["caso_id"]">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <partial name="~/Views/Shared/_CategoriaSelect.cshtml" model="@Model" />
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="javascript:void(0);" onclick="history.go(-1);">Back to List</a>
+</div>

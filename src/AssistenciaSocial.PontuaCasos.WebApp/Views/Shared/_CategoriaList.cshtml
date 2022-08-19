@@ -1,0 +1,20 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <span class="fw-bold fs-5">@Html.DisplayFor(modelItem => item.Titulo)</span> <span style="font-size: 0.8em;">(multiplicador: @item.Pontos)</span>
+                </td>
+                @foreach (var subitem in item.Itens)
+                {
+                    <td>
+                        <p>@subitem.Titulo <span style="font-size: 0.8em;">(@subitem.Pontos pontos)</span></p>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
