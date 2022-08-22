@@ -7,10 +7,13 @@ public class Item : ModelBaseControle
     public string Titulo { get; set; } = null!;
     public int Pontos { get; set; }
     public bool Ativo { get; set; }
-    public bool Multiplo { get; set; }
+    public bool UnicaPorFamilia { get; set; }
+    public bool UnicaPorAtendido { get; set; }
     public bool Categoria { get; set; }
     public int OrganizacaoId { get; set; }
     public Organizacao? Organizacao { get; set; }
     public int? ItemId { get; set; }
     public List<Item>? Itens { get; set; }
+    public List<Caso>? Casos { get; internal set; }
+    public Item? CategoriaPai { get; set; }
 }

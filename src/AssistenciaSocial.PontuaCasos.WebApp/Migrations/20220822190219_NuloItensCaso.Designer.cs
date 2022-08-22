@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     [DbContext(typeof(PontuaCasosContext))]
-    [Migration("20220817165502_RefactoringControle")]
-    partial class RefactoringControle
+    [Migration("20220822190219_NuloItensCaso")]
+    partial class NuloItensCaso
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -77,9 +77,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     b.Property<bool>("Ativo")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("CasoId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("Categoria")
                         .HasColumnType("bit");
 
@@ -100,9 +97,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Multiplo")
-                        .HasColumnType("bit");
-
                     b.Property<int>("OrganizacaoId")
                         .HasColumnType("int");
 
@@ -113,9 +107,13 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<bool>("UnicaPorAtendido")
+                        .HasColumnType("bit");
 
-                    b.HasIndex("CasoId");
+                    b.Property<bool>("UnicaPorFamilia")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("CriadoPorId");
 
@@ -126,6 +124,37 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     b.HasIndex("OrganizacaoId");
 
                     b.ToTable("Itens");
+                });
+
+            modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.ItensCasos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CasoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ItemPai")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CasoId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("ItemPai");
+
+                    b.ToTable("ItensCasos");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
@@ -414,19 +443,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", b =>
                 {
-                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Caso", null)
-                        .WithMany("Itens")
-                        .HasForeignKey("CasoId");
-
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", "CriadoPor")
                         .WithMany()
                         .HasForeignKey("CriadoPorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", null)
+                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", "CategoriaPai")
                         .WithMany("Itens")
-                        .HasForeignKey("ItemId");
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", "ModificadoPor")
                         .WithMany()
@@ -435,16 +461,40 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .IsRequired();
 
                     b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", "Organizacao")
-                        .WithMany()
+                        .WithMany("Itens")
                         .HasForeignKey("OrganizacaoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CategoriaPai");
 
                     b.Navigation("CriadoPor");
 
                     b.Navigation("ModificadoPor");
 
                     b.Navigation("Organizacao");
+                });
+
+            modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.ItensCasos", b =>
+                {
+                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Caso", null)
+                        .WithMany()
+                        .HasForeignKey("CasoId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ItensCasos_Casos_CasoId");
+
+                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_ItensCasos_Itens_ItemId");
+
+                    b.HasOne("AssistenciaSocial.PontuaCasos.WebApp.Models.ItensCasos", null)
+                        .WithMany()
+                        .HasForeignKey("ItemPai")
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
@@ -539,11 +589,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Caso", b =>
-                {
-                    b.Navigation("Itens");
-                });
-
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", b =>
                 {
                     b.Navigation("Itens");
@@ -552,6 +597,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
                 {
                     b.Navigation("Administradores");
+
+                    b.Navigation("Itens");
                 });
 #pragma warning restore 612, 618
         }

@@ -146,8 +146,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CriadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CriadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModificadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ModificadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -174,9 +174,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     Ativo = table.Column<bool>(type: "bit", nullable: false),
                     OrganizacaoId = table.Column<int>(type: "int", nullable: false),
                     CriadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CriadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModificadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CriadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ModificadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -185,7 +185,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         name: "FK_Casos_AspNetUsers_CriadoPorId",
                         column: x => x.CriadoPorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Casos_AspNetUsers_ModificadoPorId",
                         column: x => x.ModificadoPorId,
@@ -200,30 +201,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MembrosOrganizacao",
-                columns: table => new
-                {
-                    OrganizacaoId = table.Column<int>(type: "int", nullable: false),
-                    UsuarioId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MembrosOrganizacao", x => new { x.OrganizacaoId, x.UsuarioId });
-                    table.ForeignKey(
-                        name: "FK_MembrosOrganizacao_Organizacoes_OrganizacaoId",
-                        column: x => x.OrganizacaoId,
-                        principalTable: "Organizacoes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MembrosOrganizacao_Usuarios_UsuarioId",
-                        column: x => x.UsuarioId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Itens",
                 columns: table => new
                 {
@@ -232,14 +209,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     Titulo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Pontos = table.Column<int>(type: "int", nullable: false),
                     Ativo = table.Column<bool>(type: "bit", nullable: false),
-                    Multiplo = table.Column<bool>(type: "bit", nullable: false),
+                    UnicaPorFamilia = table.Column<bool>(type: "bit", nullable: false),
+                    UnicaPorAtendido = table.Column<bool>(type: "bit", nullable: false),
+                    Categoria = table.Column<bool>(type: "bit", nullable: false),
                     OrganizacaoId = table.Column<int>(type: "int", nullable: false),
+                    ItemId = table.Column<int>(type: "int", nullable: true),
                     CriadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CriadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CriadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ModificadoPorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CasoId = table.Column<int>(type: "int", nullable: true),
-                    ItemId = table.Column<int>(type: "int", nullable: true)
+                    ModificadoEm = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,16 +226,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         name: "FK_Itens_AspNetUsers_CriadoPorId",
                         column: x => x.CriadoPorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Itens_AspNetUsers_ModificadoPorId",
                         column: x => x.ModificadoPorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Itens_Casos_CasoId",
-                        column: x => x.CasoId,
-                        principalTable: "Casos",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Itens_Itens_ItemId",
@@ -270,6 +244,62 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         principalTable: "Organizacoes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MembrosOrganizacao",
+                columns: table => new
+                {
+                    MembrosId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OrganizacoesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MembrosOrganizacao", x => new { x.MembrosId, x.OrganizacoesId });
+                    table.ForeignKey(
+                        name: "FK_MembrosOrganizacao_AspNetUsers_MembrosId",
+                        column: x => x.MembrosId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MembrosOrganizacao_Organizacoes_OrganizacoesId",
+                        column: x => x.OrganizacoesId,
+                        principalTable: "Organizacoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItensCasos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CasoId = table.Column<int>(type: "int", nullable: false),
+                    ItemId = table.Column<int>(type: "int", nullable: false),
+                    ItemPai = table.Column<int>(type: "int", nullable: false),
+                    Ativo = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItensCasos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ItensCasos_Casos_CasoId",
+                        column: x => x.CasoId,
+                        principalTable: "Casos",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ItensCasos_Itens_ItemId",
+                        column: x => x.ItemId,
+                        principalTable: "Itens",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ItensCasos_ItensCasos_ItemPai",
+                        column: x => x.ItemPai,
+                        principalTable: "ItensCasos",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -332,11 +362,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                 column: "OrganizacaoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Itens_CasoId",
-                table: "Itens",
-                column: "CasoId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Itens_CriadoPorId",
                 table: "Itens",
                 column: "CriadoPorId");
@@ -357,9 +382,24 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                 column: "OrganizacaoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MembrosOrganizacao_UsuarioId",
+                name: "IX_ItensCasos_CasoId",
+                table: "ItensCasos",
+                column: "CasoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItensCasos_ItemId",
+                table: "ItensCasos",
+                column: "ItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItensCasos_ItemPai",
+                table: "ItensCasos",
+                column: "ItemPai");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MembrosOrganizacao_OrganizacoesId",
                 table: "MembrosOrganizacao",
-                column: "UsuarioId");
+                column: "OrganizacoesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Organizacoes_CriadoPorId",
@@ -429,7 +469,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Itens");
+                name: "ItensCasos");
 
             migrationBuilder.DropTable(
                 name: "MembrosOrganizacao");
@@ -439,6 +479,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Casos");
+
+            migrationBuilder.DropTable(
+                name: "Itens");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

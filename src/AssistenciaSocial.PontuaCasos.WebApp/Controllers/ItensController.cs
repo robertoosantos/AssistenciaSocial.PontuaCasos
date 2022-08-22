@@ -58,7 +58,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,Multiplo")] Item item)
+        public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,UnicaPorFamilia,UnicaPorAtendido")] Item item)
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
 
@@ -110,7 +110,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,UnicaPorFamilia,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
         {
             if (id != item.Id)
             {

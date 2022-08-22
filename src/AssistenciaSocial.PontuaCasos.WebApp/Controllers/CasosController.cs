@@ -36,12 +36,37 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var caso = await _context.Casos
                 .Include(c => c.Itens)
-                .ThenInclude(i => i.Itens)
+                .ThenInclude(i => i.CategoriaPai)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            var categorias = new Dictionary<int, Item>();
+
             if (caso == null)
             {
                 return NotFound();
             }
+
+            foreach (var item in caso.Itens)
+            {
+                Item? existe = null;
+                if (item.ItemId != null)
+                {
+                    if (categorias.TryGetValue((int)item.ItemId, out existe))
+                    {
+                        if (existe.Itens != null)
+                            existe.Itens.Add(item);
+                    }
+                    else
+                    {
+                        var categoria = _context.Itens.First(i => i.Id == item.ItemId);
+                        categoria.Itens = new List<Item>();
+                        categoria.Itens.Add(item);
+                        categorias.Add((int)item.ItemId, categoria);
+                    }
+                }
+            }
+
+            caso.Itens = categorias.Values.ToList();
 
             return View(caso);
         }
@@ -49,7 +74,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Create
         public IActionResult Create()
         {
-            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && !i.Multiplo).ToList();
+            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && i.UnicaPorFamilia).ToList();
             return View();
         }
 
@@ -60,37 +85,21 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Pontos,Ativo")] Caso caso)
         {
-            var itens = new Dictionary<int, Item>();
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
-            int pontos = 0;
+            var categorias = new List<Item>();
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
             foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
             {
                 var id = int.Parse(item.Value[0].Replace("itens_", ""));
                 var itemSelecionado = _context.Itens.FirstOrDefault(i => i.Id == id);
-
                 if (itemSelecionado != null && itemSelecionado.ItemId != null)
                 {
-                    Item? existe = null;
+                    categorias.Add(_context.Itens.First(i => i.Id == itemSelecionado.ItemId));
+                    
+                    if (caso.Itens == null)
+                        caso.Itens = new List<Item>();
 
-                    if (itens.TryGetValue((int)itemSelecionado.ItemId, out existe))
-                    {
-                        if (existe.Itens != null)
-                        {
-                            existe.Itens.Add(itemSelecionado);
-                            pontos += existe.Pontos * itemSelecionado.Pontos;
-                        }
-                    }
-                    else
-                    {
-                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.ItemId);
-                        categoria.Itens = new List<Item>();
-                        categoria.Itens.Add(itemSelecionado);
-
-                        pontos += categoria.Pontos * itemSelecionado.Pontos;
-
-                        itens.Add((int)itemSelecionado.ItemId, categoria);
-                    }
+                    caso.Itens.Add(itemSelecionado);
                 }
             }
 
@@ -98,8 +107,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             caso.ModificadoEm = caso.CriadoEm;
             caso.CriadoPorId = user.Id;
             caso.ModificadoPorId = user.Id;
-            caso.Pontos = pontos;
-            caso.Itens = itens.Values.ToList();
+            caso.CalcularPontos(categorias);
+
             if (user.Organizacoes != null)
                 caso.Organizacao = user.Organizacoes.First();
 
