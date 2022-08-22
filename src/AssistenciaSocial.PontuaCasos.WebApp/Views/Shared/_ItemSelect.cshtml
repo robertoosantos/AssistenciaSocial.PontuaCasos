@@ -1,0 +1,22 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+
+<table class="table">
+    <thead>
+        <tr>
+            @foreach (var item in Model)
+            {
+                <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @foreach (var item in Model)
+            {
+                    <td>
+                        @Html.DropDownList("Itens", new SelectList(item.Itens, "Id", "Titulo"))
+                    </td>
+            }
+        </tr>
+    </tbody>
+</table>

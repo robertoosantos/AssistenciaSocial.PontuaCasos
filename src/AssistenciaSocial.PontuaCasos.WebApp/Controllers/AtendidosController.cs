@@ -45,7 +45,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && i.Multiplo).ToList();
+            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && !i.UnicaPorFamilia).ToList();
+            foreach (var item in itens)
+            {
+                if (item.Itens != null)
+                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "" });
+            }
             return View(itens);
         }
 
@@ -54,33 +59,61 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,Multiplo")] Item item)
+        public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            var categorias = new List<Item>();
+            var itens = new List<ItensCasos>();
+            Item? itemUnico = null;
 
-            if (user.Organizacoes is not null)
-                item.Organizacao = user.Organizacoes.First();
+            var caso = _context.Casos.Include(c => c.Itens).First(c => caso_id != null && c.Id == int.Parse(caso_id));
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
-            item.Ativo = true;
-            item.CriadoEm = DateTime.Now;
-            item.ModificadoEm = DateTime.Now;
-            item.Categoria = false;
-
-            if (categoria_id is not null)
-                item.ItemId = int.Parse(categoria_id);
-
-            item.CriadoPorId = user.Id;
-            item.ModificadoPorId = user.Id;
-
-            ModelState.Clear();
-            if (!TryValidateModel(item, nameof(item)) || item.ItemId is null)
+            foreach (string idItem in Request.Form["Itens"])
             {
-                return View(item);
+                var id = int.Parse(idItem);
+
+                if (id > 0)
+                {
+                    var itemSelecionado = _context.Itens.FirstOrDefault(i => i.Id == id);
+
+                    if (itemSelecionado != null && itemSelecionado.ItemId != null)
+                    {
+                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.ItemId);
+                        categorias.Add(categoria);
+
+                        if (categoria.UnicaPorAtendido)
+                        {
+                            itemUnico = itemSelecionado;
+                        }
+
+                        itens.Add(new ItensCasos()
+                        {
+                            ItemId = itemSelecionado.Id,
+                            CasoId = caso.Id
+                        });
+                    }
+                }
             }
 
-            _context.Add(item);
+            if (itemUnico != null)
+            {
+                foreach (var itemCaso in itens)
+                {
+                    if (itemCaso.ItemId != itemUnico.Id)
+                        itemCaso.ItemPai = itemUnico.Id;
+                }
+            }
+
+            ModelState.Clear();
+            if (!TryValidateModel(caso, nameof(caso)))
+            {
+                return View(caso);
+            }
+
+            _context.AddRange(itens);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Categorias", new { id = categoria_id });
+
+            return RedirectToAction("Details", "Casos", new { id = caso_id });
         }
 
         // GET: Itens/Edit/5
@@ -106,14 +139,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,Multiplo,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,UnicaPorFamilia,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
         {
             if (id != item.Id)
             {
                 return NotFound();
             }
 
-            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => User.Identity != null && u.Email == User.Identity.Name);
             item.ModificadoEm = DateTime.Now;
             item.ModificadoPorId = user.Id;
 
