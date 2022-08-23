@@ -39,7 +39,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .ThenInclude(i => i.CategoriaPai)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            var categorias = new Dictionary<int, Item>();
+            var itensAtendidos = _context.Itens.Where(i => !i.UnicaPorFamilia).ToList();
+
+            var categorias = new Dictionary<int, Item>();            
 
             if (caso == null)
             {
@@ -48,9 +50,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             foreach (var item in caso.Itens)
             {
-                Item? existe = null;
+                var itemCaso = _context.ItensCasos.First(ic => ic.CasoId == caso.Id && ic.ItemId == item.Id);
+
                 if (item.ItemId != null)
                 {
+                    Item? existe = null;
+
+                    var categoria = _context.Itens.First(i => i.Id == item.ItemId);
+
                     if (categorias.TryGetValue((int)item.ItemId, out existe))
                     {
                         if (existe.Itens != null)
@@ -58,7 +65,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     }
                     else
                     {
-                        var categoria = _context.Itens.First(i => i.Id == item.ItemId);
+
                         categoria.Itens = new List<Item>();
                         categoria.Itens.Add(item);
                         categorias.Add((int)item.ItemId, categoria);
@@ -95,7 +102,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 if (itemSelecionado != null && itemSelecionado.ItemId != null)
                 {
                     categorias.Add(_context.Itens.First(i => i.Id == itemSelecionado.ItemId));
-                    
+
                     if (caso.Itens == null)
                         caso.Itens = new List<Item>();
 
