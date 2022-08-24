@@ -16,6 +16,7 @@ public class Caso : ModelBaseControle
     public bool Ativo { get; set; }
     public Organizacao Organizacao { get; set; } = null!;
     public List<Item> Itens { get; set; } = null!;
+    public List<ItensCasos>? ItensCaso { get; set; }
     [NotMapped]
     public List<Item>? Categorias { get; set; }
 

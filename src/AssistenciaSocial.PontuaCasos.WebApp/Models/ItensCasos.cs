@@ -6,6 +6,8 @@ public class ItensCasos
     public int Id { get; set; }
     public int CasoId { get; set; }
     public int ItemId { get; set; }
+    public Caso? Caso { get; set; }
+    public Item? Item { get; set; }
     public int? ItemPai { get; set; }
     public bool Ativo { get; set; }
 }

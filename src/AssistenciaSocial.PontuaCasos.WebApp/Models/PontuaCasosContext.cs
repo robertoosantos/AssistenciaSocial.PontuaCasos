@@ -41,14 +41,14 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .WithMany(i => i.Casos)
             .UsingEntity<ItensCasos>(
         j => j
-            .HasOne<Item>()
+            .HasOne<Item>(ic => ic.Item)
             .WithMany()
             .HasForeignKey("ItemId")
             .HasConstraintName("FK_ItensCasos_Itens_ItemId")
             .OnDelete(DeleteBehavior.Cascade),
         j => j
-            .HasOne<Caso>()
-            .WithMany()
+            .HasOne<Caso>(ic => ic.Caso)
+            .WithMany(c => c.ItensCaso)
             .HasForeignKey("CasoId")
             .HasConstraintName("FK_ItensCasos_Casos_CasoId")
             .OnDelete(DeleteBehavior.ClientCascade),
