@@ -21,7 +21,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Itens
         public async Task<IActionResult> Index()
         {
-            var pontuaCasosContext = _context.Itens.Where(i => !i.Categoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
+            var pontuaCasosContext = _context.Itens.Where(i => !i.ECategoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
             return View(await pontuaCasosContext.ToListAsync());
         }
 
@@ -68,16 +68,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             item.Ativo = true;
             item.CriadoEm = DateTime.Now;
             item.ModificadoEm = DateTime.Now;
-            item.Categoria = false;
+            item.ECategoria = false;
 
             if (categoria_id is not null)
-                item.ItemId = int.Parse(categoria_id);
+                item.CategoriaId = int.Parse(categoria_id);
 
             item.CriadoPorId = user.Id;
             item.ModificadoPorId = user.Id;
 
             ModelState.Clear();
-            if (!TryValidateModel(item, nameof(item)) || item.ItemId is null)
+            if (!TryValidateModel(item, nameof(item)) || item.CategoriaId is null)
             {
                 return View(item);
             }
@@ -139,7 +139,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Details", "Categorias", new { id = item.ItemId });
+                return RedirectToAction("Details", "Categorias", new { id = item.CategoriaId });
             }
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);

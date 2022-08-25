@@ -16,41 +16,26 @@ public class Caso : ModelBaseControle
     public bool Ativo { get; set; }
     public Organizacao Organizacao { get; set; } = null!;
     public List<Item> Itens { get; set; } = null!;
-    public List<ItensCasos>? ItensCaso { get; set; }
     [NotMapped]
     public List<Item>? Categorias { get; set; }
 
-    public Caso(string responsavelFamiliar, string titulo, string prontuario){
+    public Caso(string responsavelFamiliar, string titulo, string prontuario)
+    {
         ResponsavelFamiliar = responsavelFamiliar;
         Titulo = titulo;
         Prontuario = prontuario;
     }
 
-    internal void CalcularPontos(List<Item> categorias)
+    internal void CalcularPontos()
     {
-        var mapaCategorias = new Dictionary<int, Item>();
-
-        foreach (var item in categorias)
-        {
-            if (item.ItemId == null)
-            {
-                Item? existe = null;
-                if (!mapaCategorias.TryGetValue(item.Id, out existe))
-                {
-                    mapaCategorias.Add(item.Id, item);
-                }
-            }
-        }
-
         int pontos = 0;
 
-        if (mapaCategorias.Count != 0)
+        foreach (var item in Itens)
         {
-            foreach (var item in Itens)
-            {
-                if (item.ItemId != null)
-                    pontos += mapaCategorias[(int)item.ItemId].Pontos * item.Pontos;
-            }
+            if (item.Categoria == null)
+                throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
+                
+            pontos += item.Categoria.Pontos * item.Pontos;
         }
 
         this.Pontos = pontos;

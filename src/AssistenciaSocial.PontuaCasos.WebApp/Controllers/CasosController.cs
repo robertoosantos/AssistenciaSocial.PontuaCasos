@@ -29,6 +29,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            //TODO: Tá tudo errado
             if (id == null || _context.Casos == null)
             {
                 return NotFound();
@@ -36,41 +37,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var caso = await _context.Casos
                 .Include(c => c.Itens)
-                .ThenInclude(i => i.CategoriaPai)
+                .ThenInclude(i => i.Categoria)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
-            var itensAtendidos = _context.Itens.Where(i => !i.UnicaPorFamilia).ToList();
 
             var categorias = new Dictionary<int, Item>();            
 
             if (caso == null)
             {
                 return NotFound();
-            }
-
-            foreach (var item in caso.Itens)
-            {
-                var itemCaso = _context.ItensCasos.First(ic => ic.CasoId == caso.Id && ic.ItemId == item.Id);
-
-                if (item.ItemId != null)
-                {
-                    Item? existe = null;
-
-                    var categoria = _context.Itens.First(i => i.Id == item.ItemId);
-
-                    if (categorias.TryGetValue((int)item.ItemId, out existe))
-                    {
-                        if (existe.Itens != null)
-                            existe.Itens.Add(item);
-                    }
-                    else
-                    {
-
-                        categoria.Itens = new List<Item>();
-                        categoria.Itens.Add(item);
-                        categorias.Add((int)item.ItemId, categoria);
-                    }
-                }
             }
 
             caso.Itens = categorias.Values.ToList();
@@ -81,7 +55,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Create
         public IActionResult Create()
         {
-            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && i.UnicaPorFamilia).ToList();
+            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
             return View();
         }
 
@@ -92,17 +66,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo")] Caso caso)
         {
-            var categorias = new List<Item>();
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
             foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
             {
                 var id = int.Parse(item.Value[0].Replace("itens_", ""));
-                var itemSelecionado = _context.Itens.FirstOrDefault(i => i.Id == id);
-                if (itemSelecionado != null && itemSelecionado.ItemId != null)
+                var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
+                if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
                 {
-                    categorias.Add(_context.Itens.First(i => i.Id == itemSelecionado.ItemId));
-
                     if (caso.Itens == null)
                         caso.Itens = new List<Item>();
 
@@ -115,7 +86,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             caso.CriadoPorId = user.Id;
             caso.ModificadoPorId = user.Id;
             caso.Ativo = true;
-            caso.CalcularPontos(categorias);
+            caso.CalcularPontos();
 
             if (user.Organizacoes != null)
                 caso.Organizacao = user.Organizacoes.First();

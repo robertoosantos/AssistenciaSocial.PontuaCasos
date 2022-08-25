@@ -16,7 +16,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var pontuaCasosContext = _context.Itens.Where(i => !i.Categoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
+            var pontuaCasosContext = _context.Itens.Where(i => !i.ECategoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
             return View(await pontuaCasosContext.ToListAsync());
         }
 
@@ -45,7 +45,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.Categoria && !i.UnicaPorFamilia).ToList();
+            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && !i.UnicaPorFamilia).ToList();
             foreach (var item in itens)
             {
                 if (item.Itens != null)
@@ -61,10 +61,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
-            var categorias = new List<Item>();
-            var itens = new List<ItensCasos>();
-            Item? itemUnico = null;
-
             var caso = _context.Casos.Include(c => c.Itens).First(c => caso_id != null && c.Id == int.Parse(caso_id));
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
@@ -74,35 +70,28 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
                 if (id > 0)
                 {
-                    var itemSelecionado = _context.Itens.FirstOrDefault(i => i.Id == id);
+                    var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
 
-                    if (itemSelecionado != null && itemSelecionado.ItemId != null)
+                    if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
                     {
-                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.ItemId);
-                        categorias.Add(categoria);
-
+                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.CategoriaId);
                         if (categoria.UnicaPorAtendido)
                         {
-                            itemUnico = itemSelecionado;
+                            var existe = caso.Itens.FirstOrDefault(i => i.Id == itemSelecionado.Id);
+                            if (existe == null)
+                                caso.Itens.Add(itemSelecionado);
                         }
-
-                        itens.Add(new ItensCasos()
+                        else
                         {
-                            ItemId = itemSelecionado.Id,
-                            CasoId = caso.Id
-                        });
+                            caso.Itens.Add(itemSelecionado);
+                        }
                     }
                 }
             }
 
-            if (itemUnico != null)
-            {
-                foreach (var itemCaso in itens)
-                {
-                    if (itemCaso.ItemId != itemUnico.Id)
-                        itemCaso.ItemPai = itemUnico.Id;
-                }
-            }
+            caso.ModificadoEm = DateTime.Now;
+            caso.ModificadoPorId = user.Id;
+            caso.CalcularPontos();
 
             ModelState.Clear();
             if (!TryValidateModel(caso, nameof(caso)))
@@ -110,7 +99,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return View(caso);
             }
 
-            _context.AddRange(itens);
+            _context.Update(caso);
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", "Casos", new { id = caso_id });
@@ -168,7 +157,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Details", "Categorias", new { id = item.ItemId });
+                return RedirectToAction("Details", "Categorias", new { id = item.CategoriaId });
             }
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);

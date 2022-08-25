@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
@@ -22,7 +23,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.Itens != null ?
-                        View(await _context.Itens.Where(i => i.Categoria).ToListAsync()) :
+                        View(await _context.Itens.Where(i => i.ECategoria).ToListAsync()) :
                         Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
         }
 
@@ -54,9 +55,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos,UnicaPorFamilia,UnicaPorAtendido")] Item item)
         {
+            if (User == null || User.Identity == null){
+                return Problem("Você precisa estar logado para criar um novo caso.");
+            }
+
             var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
 
             if (user.Organizacoes is not null)
@@ -65,7 +71,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             item.Ativo = true;
             item.CriadoEm = DateTime.Now;
             item.ModificadoEm = DateTime.Now;
-            item.Categoria = true;
+            item.ECategoria = true;
             item.CriadoPorId = user.Id;
             item.ModificadoPorId = user.Id;
 

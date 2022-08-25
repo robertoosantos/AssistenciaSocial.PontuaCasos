@@ -9,7 +9,6 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     public DbSet<Organizacao> Organizacoes => Set<Organizacao>();
     public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<Item> Itens => Set<Item>();
-    public DbSet<ItensCasos> ItensCasos => Set<ItensCasos>();
 
     public PontuaCasosContext(DbContextOptions<PontuaCasosContext> options) : base(options)
     {
@@ -26,9 +25,15 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Item>()
-            .HasOne(i => i.CategoriaPai)
+            .HasOne(i => i.RelacionadoA)
+            .WithMany()
+            .HasForeignKey(i => i.RelacionadoAoID)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Item>()
+            .HasOne(i => i.Categoria)
             .WithMany(c => c.Itens)
-            .HasForeignKey(i => i.ItemId)
+            .HasForeignKey(i => i.CategoriaId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Caso>()
@@ -39,24 +44,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Caso>()
             .HasMany(c => c.Itens)
             .WithMany(i => i.Casos)
-            .UsingEntity<ItensCasos>(
-        j => j
-            .HasOne<Item>(ic => ic.Item)
-            .WithMany()
-            .HasForeignKey("ItemId")
-            .HasConstraintName("FK_ItensCasos_Itens_ItemId")
-            .OnDelete(DeleteBehavior.Cascade),
-        j => j
-            .HasOne<Caso>(ic => ic.Caso)
-            .WithMany(c => c.ItensCaso)
-            .HasForeignKey("CasoId")
-            .HasConstraintName("FK_ItensCasos_Casos_CasoId")
-            .OnDelete(DeleteBehavior.ClientCascade),
-        j => j
-            .HasOne<ItensCasos>()
-            .WithMany()
-            .HasForeignKey(ic => ic.ItemPai)
-            .OnDelete(DeleteBehavior.NoAction));
+            .UsingEntity(ic => ic.ToTable("ItensCasos"));
 
         modelBuilder.Entity<Organizacao>()
             .HasOne(o => o.CriadoPor)
