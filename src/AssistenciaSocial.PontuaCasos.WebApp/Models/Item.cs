@@ -16,6 +16,6 @@ public class Item : ModelBaseControle
     public List<Item>? Itens { get; set; }
     public List<Caso>? Casos { get; internal set; }
     public Item? Categoria { get; set; }
-    public int? RelacionadoAoID { get; set; }
+    public int? RelacionadoAoId { get; set; }
     public Item? RelacionadoA { get; set; }
 }

@@ -27,7 +27,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Item>()
             .HasOne(i => i.RelacionadoA)
             .WithMany()
-            .HasForeignKey(i => i.RelacionadoAoID)
+            .HasForeignKey(i => i.RelacionadoAoId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Item>()
@@ -44,7 +44,20 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Caso>()
             .HasMany(c => c.Itens)
             .WithMany(i => i.Casos)
-            .UsingEntity(ic => ic.ToTable("ItensCasos"));
+            .UsingEntity<Dictionary<string, object>>(
+                "ItensCasos",
+                j => j
+                    .HasOne<Item>()
+                    .WithMany()
+                    .HasForeignKey("ItemId")
+                    .HasConstraintName("FK_ItensCasos_Itens_ItemId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<Caso>()
+                    .WithMany()
+                    .HasForeignKey("CasoId")
+                    .HasConstraintName("FK_ItensCasos_Casos_CasoId")
+                    .OnDelete(DeleteBehavior.ClientCascade));
 
         modelBuilder.Entity<Organizacao>()
             .HasOne(o => o.CriadoPor)

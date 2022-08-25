@@ -4,6 +4,7 @@ using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     [DbContext(typeof(PontuaCasosContext))]
-    partial class PontuaCasosContextModelSnapshot : ModelSnapshot
+    [Migration("20220825154536_NovaModelagemItens")]
+    partial class NovaModelagemItens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
