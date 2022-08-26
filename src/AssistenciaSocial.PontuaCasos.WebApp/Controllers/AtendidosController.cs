@@ -48,8 +48,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && !i.UnicaPorFamilia).ToList();
             foreach (var item in itens)
             {
-                if (item.Itens != null)
+                if (item.Itens != null){
+                    item.Itens.Sort();
                     item.Itens.Insert(0, new Item { Id = 0, Titulo = "" });
+                    }
             }
             return View(itens);
         }

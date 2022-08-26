@@ -10,32 +10,28 @@ public class Caso : ModelBaseControle
 
     public int Id { get; set; }
     public int Pontos { get; set; }
-    public string ResponsavelFamiliar { get; set; }
-    public string Titulo { get; set; }
-    public string Prontuario { get; set; }
+    public string ResponsavelFamiliar { get; set; } = null!;
+    public string Titulo { get; set; } = null!;
+    public string Prontuario { get; set; } = null!;
     public bool Ativo { get; set; }
-    public Organizacao Organizacao { get; set; } = null!;
-    public List<Item> Itens { get; set; } = null!;
+    public Organizacao? Organizacao { get; set; }
+    public List<Item>? Itens { get; set; }
     [NotMapped]
     public List<Item>? Categorias { get; set; }
-
-    public Caso(string responsavelFamiliar, string titulo, string prontuario)
-    {
-        ResponsavelFamiliar = responsavelFamiliar;
-        Titulo = titulo;
-        Prontuario = prontuario;
-    }
 
     internal void CalcularPontos()
     {
         int pontos = 0;
 
-        foreach (var item in Itens)
+        if (Itens != null)
         {
-            if (item.Categoria == null)
-                throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
+            foreach (var item in Itens)
+            {
+                if (item == null || item.Categoria == null)
+                    throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
                 
-            pontos += item.Categoria.Pontos * item.Pontos;
+                pontos += item.Categoria.Pontos * item.Pontos;
+            }
         }
 
         this.Pontos = pontos;

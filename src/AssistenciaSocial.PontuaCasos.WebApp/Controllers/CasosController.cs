@@ -40,11 +40,34 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .ThenInclude(i => i.Categoria)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            var categorias = new Dictionary<int, Item>();            
-
             if (caso == null)
             {
                 return NotFound();
+            }
+
+            var categorias = new Dictionary<int, Item>(); 
+
+            foreach (var item in caso.Itens)
+            {
+                if (item.CategoriaId != null)
+                {
+                    Item? existe;
+
+                    var categoria = _context.Itens.First(i => i.Id == item.CategoriaId);
+
+                    if (categorias.TryGetValue((int)item.CategoriaId, out existe))
+                    {
+                        if (existe.Itens != null)
+                            existe.Itens.Add(item);
+                    }
+                    else
+                    {
+
+                        categoria.Itens = new List<Item>();
+                        categoria.Itens.Add(item);
+                        categorias.Add((int)item.CategoriaId, categoria);
+                    }
+                }
             }
 
             caso.Itens = categorias.Values.ToList();
@@ -64,7 +87,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo")] Caso caso)
+        public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar")] Caso caso)
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
