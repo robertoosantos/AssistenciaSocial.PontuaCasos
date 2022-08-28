@@ -63,7 +63,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
-            var caso = _context.Casos.Include(c => c.Itens).First(c => caso_id != null && c.Id == int.Parse(caso_id));
+            var caso = _context.Casos.Include(c => c.Itens).ThenInclude(i => i.Categoria).First(c => caso_id != null && c.Id == int.Parse(caso_id));
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
             foreach (string idItem in Request.Form["Itens"])
@@ -74,10 +74,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 {
                     var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
 
-                    if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
+                    if (itemSelecionado != null && itemSelecionado.Categoria != null)
                     {
-                        var categoria = _context.Itens.First(i => i.Id == itemSelecionado.CategoriaId);
-                        if (categoria.UnicaPorAtendido)
+                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.Itens != null)
                         {
                             var existe = caso.Itens.FirstOrDefault(i => i.Id == itemSelecionado.Id);
                             if (existe == null)
@@ -85,6 +84,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                         }
                         else
                         {
+                            if (caso.Itens == null)
+                                caso.Itens = new List<Item>();
+
                             caso.Itens.Add(itemSelecionado);
                         }
                     }

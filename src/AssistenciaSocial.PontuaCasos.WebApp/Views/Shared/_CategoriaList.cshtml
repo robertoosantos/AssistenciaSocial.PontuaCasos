@@ -22,6 +22,7 @@
 </table>
 @{
     var atendidos = Model.Where(m => !m.UnicaPorFamilia).ToList();
+    atendidos.Sort();
     var colunas = atendidos.Count();
     var fimDeAtendidos = true;
 

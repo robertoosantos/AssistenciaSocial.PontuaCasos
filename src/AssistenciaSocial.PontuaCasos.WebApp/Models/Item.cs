@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
-public class Item : ModelBaseControle, IComparer<Item>
+public class Item : ModelBaseControle, IComparable<Item>
 {
     public int Id { get; set; }
     public string Titulo { get; set; } = null!;
@@ -20,52 +20,40 @@ public class Item : ModelBaseControle, IComparer<Item>
     public int? RelacionadoAoId { get; set; }
     public Item? RelacionadoA { get; set; }
 
-    public int Compare(Item? x, Item? y)
+    public int CompareTo(Item? item)
     {
-        if (x == null)
-        {
-            if (y == null)
-                return 0;
-            return -1;
-        }
-
-        if (y == null)
+        if (item == null)
             return 1;
 
-        if (x.ECategoria){
-            if (!y.ECategoria)
+        if ((CategoriaId != null && Categoria == null) || (item.CategoriaId != null && item.Categoria == null))
+        {
+            throw new ApplicationException("A categoria precisa estar carregada.");
+        }
+
+        if ((RelacionadoAoId != null && RelacionadoA == null) || (item.RelacionadoAoId != null && item.RelacionadoA == null))
+        {
+            throw new ApplicationException("O item relacionado precisa estar carregado.");
+        }
+
+        if (ECategoria)
+        {
+            if (!item.ECategoria)
                 return 1;
 
-            return CompararPontos(x, y);
-            }
-
-        if (x.RelacionadoAoId == null)
-        {
-            if (y.RelacionadoAoId == null)
-                return CompararPontos(x, y);
-
-            return -1;
+            return Id.CompareTo(item.Id);
         }
 
-        if (y.RelacionadoAoId != null)
+        if (Categoria.RelacionadoAoId == null)
+        {
+            if (item.Categoria.RelacionadoAoId == null)
+                return Id.CompareTo(item.Id);
+
             return 1;
+        }
 
-        if (x.Id < y.Id)
-            return -1;
-        
-        if (x.Id > y.Id)
-             return 1;
-
-        return 0;
-    }
-
-    private static int CompararPontos(Item x, Item y)
-    {
-        if (x.Pontos > y.Pontos)
-            return 1;
-        if (x.Pontos < y.Pontos)
+        if (item.Categoria.RelacionadoAoId == null)
             return -1;
 
-        return 0;
+        return ((int)Categoria.RelacionadoAoId).CompareTo(item.Categoria.RelacionadoAoId);
     }
 }
