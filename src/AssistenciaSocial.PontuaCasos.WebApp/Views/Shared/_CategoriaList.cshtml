@@ -1,6 +1,5 @@
 @model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
 
-<h4>Sobre a família</h4>
 <table class="table">
     <tbody>
         @foreach (var item in Model.Where(m => m.UnicaPorFamilia).ToList())
@@ -20,53 +19,3 @@
         }
     </tbody>
 </table>
-@{
-    var atendidos = Model.Where(m => !m.UnicaPorFamilia).ToList();
-    atendidos.Sort();
-    var colunas = atendidos.Count();
-    var fimDeAtendidos = true;
-
-    if (atendidos != null && colunas > 0)
-    {
-        <h4 class="mt-2">Atendidos</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    @foreach (var item in atendidos)
-                    {
-                        <th>
-                            <span class="fw-bold fs-5">@Html.DisplayFor(modelItem => item.Titulo)</span> <span
-                        style="font-size: 0.8em;">(multiplicador: @item.Pontos)</span>
-                        </th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < 100; i++)
-                {
-                    <tr>
-                        @{
-                            for (int j = 0; j < colunas; j++)
-                            {
-                                <td>
-                                    @if (atendidos[j].Itens != null && atendidos[j].Itens.Count() > i)
-                                    {
-                                        fimDeAtendidos = false;
-                                        var item = atendidos[j].Itens[i];
-
-                                        <p>@item.Titulo <span style="font-size: 0.8em;">(multiplicador: @item.Pontos)</span></p>
-                                    }
-                                </td>
-                            }
-                        }
-                    </tr>
-
-                    if (fimDeAtendidos)
-                        break;
-                    else
-                        fimDeAtendidos = true;
-                }
-            </tbody>
-        </table>
-    }
-}

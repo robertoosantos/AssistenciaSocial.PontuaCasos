@@ -67,7 +67,36 @@
     </dl>
 </div>
 <div>
+    <h4>Sobre a família</h4>
     <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Itens" />
+    <h4>Indivíduos em Violação</h4>
+    <table>
+    @{
+        foreach (var individuo in Model.Individuos)
+        {
+            var violencias = individuo.Violencias;
+            var saude = individuo.Saude; 
+
+            var linhas = violencias.Count() + saude.Count();
+
+            <tr>
+                <td rowspan="@linhas">@individuo.Titulo</td>
+                @foreach (var violencia in individuo.Violencias)
+                {
+                    @:</tr><tr>
+                    <td>@violencia.Titulo</td>
+                    <td>@violencia.Situacao</td>
+                }
+
+                @foreach (var itemSaude in individuo.Saude)
+                {
+                    @:</tr><tr>
+                    <td>@itemSaude.Titulo</td>
+                }
+            </tr>
+        }
+    }
+    </table>
 </div>
 <div>
     <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id">Adicionar Atendidos</a> |

@@ -9,6 +9,8 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     public DbSet<Organizacao> Organizacoes => Set<Organizacao>();
     public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<Item> Itens => Set<Item>();
+    public DbSet<IndividuoEmViolacao> IndividuosEmViolacao => Set<IndividuoEmViolacao>();
+    public DbSet<Violencia> Violencias => Set<Violencia>();
 
     public PontuaCasosContext(DbContextOptions<PontuaCasosContext> options) : base(options)
     {

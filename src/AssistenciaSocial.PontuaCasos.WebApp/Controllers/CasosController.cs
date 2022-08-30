@@ -38,6 +38,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var caso = await _context.Casos
                 .Include(c => c.Itens)
                 .ThenInclude(i => i.Categoria)
+                .Include(c => c.Individuos)
+                .ThenInclude(i => i.Violencias)
+                .ThenInclude(v => v.Situacao)
+                .Include(c => c.Individuos)
+                .ThenInclude(i => i.Saude)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (caso == null)
