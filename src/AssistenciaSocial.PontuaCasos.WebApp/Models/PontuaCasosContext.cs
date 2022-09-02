@@ -43,6 +43,35 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
 
+
+        modelBuilder.Entity<Violencia>()
+            .HasOne(v => v.Situacao)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<IndividuoEmViolacao>()
+            .HasMany(i => i.Saude)
+            .WithMany(s => s.Individuos)
+            .UsingEntity("SaudeIndiduosEmViolacao");
+
+        modelBuilder.Entity<Violencia>()
+            .HasMany(v => v.Individuos)
+            .WithMany(i => i.Violencias)
+            .UsingEntity<Dictionary<string, object>>(
+                "ViolenciasIndividuos",
+                j => j
+                    .HasOne<IndividuoEmViolacao>()
+                    .WithMany()
+                    .HasForeignKey("IndividuoId")
+                    .HasConstraintName("FK_ViolenciasIndividuos_Individuos_IndividuoId")
+                    .OnDelete(DeleteBehavior.ClientCascade),
+                    j => j
+                    .HasOne<Violencia>()
+                    .WithMany()
+                    .HasForeignKey("ViolenciaId")
+                    .HasConstraintName("FK_ViolenciasIndividuos_Violencias_ViolenciaId")
+                    .OnDelete(DeleteBehavior.Cascade));
+
         modelBuilder.Entity<Caso>()
             .HasMany(c => c.Itens)
             .WithMany(i => i.Casos)

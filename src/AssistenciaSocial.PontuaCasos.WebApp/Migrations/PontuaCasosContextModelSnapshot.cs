@@ -73,7 +73,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("OrganizacaoId");
 
-                    b.ToTable("Casos");
+                    b.ToTable("Casos", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", b =>
@@ -138,7 +138,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("RelacionadoAoId");
 
-                    b.ToTable("Itens");
+                    b.ToTable("Itens", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
@@ -173,7 +173,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ModificadoPorId");
 
-                    b.ToTable("Organizacoes");
+                    b.ToTable("Organizacoes", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", b =>
@@ -258,7 +258,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("ItensCasos");
+                    b.ToTable("ItensCasos", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

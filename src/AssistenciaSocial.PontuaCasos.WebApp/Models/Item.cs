@@ -15,7 +15,8 @@ public class Item : ModelBaseControle
     public Organizacao? Organizacao { get; set; }
     public int? CategoriaId { get; set; }
     public List<Item>? Itens { get; set; }
-    public List<Caso>? Casos { get; internal set; }
+    public List<Caso>? Casos { get; set; }
+    public List<IndividuoEmViolacao>? Individuos { get; set; }
     public Item? Categoria { get; set; }
     public int? RelacionadoAoId { get; set; }
     public Item? RelacionadoA { get; set; }
