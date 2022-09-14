@@ -36,8 +36,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var caso = await _context.Casos
-                /* .Include(c => c.ItensFamiliares)
-                .ThenInclude(i => i.Categoria)
+                .Include(c => c.ItensFamiliares)
+                /*.ThenInclude(i => i.Categoria)
                 .Include(c => c.Individuos)
                 .ThenInclude(i => i.ViolenciasSofridas)
                 .ThenInclude(v => v.Situacao)

@@ -48,10 +48,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && !i.UnicaPorFamilia).ToList();
             foreach (var item in itens)
             {
-                if (item.Itens != null){
-                    item.Itens.Sort();
+                if (item.Itens != null)
+                {
                     item.Itens.Insert(0, new Item { Id = 0, Titulo = "" });
-                    }
+                }
             }
             return View(itens);
         }
@@ -63,7 +63,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
-            var caso = _context.Casos.Include(c => c.ItensFamiliares).ThenInclude(i => i.Categoria).First(c => caso_id != null && c.Id == int.Parse(caso_id));
+            var caso = _context.Casos.Include(c => c.Individuos).First(c => caso_id != null && c.Id == int.Parse(caso_id));
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
             foreach (string idItem in Request.Form["Itens"])
@@ -76,18 +76,24 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
                     if (itemSelecionado != null && itemSelecionado.Categoria != null)
                     {
-                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.ItensFamiliares != null)
+                        var individuo = new IndividuoEmViolacao
                         {
-                            var existe = caso.ItensFamiliares.FirstOrDefault(i => i.Id == itemSelecionado.Id);
+                            ItemId = itemSelecionado.Id,
+                            CasoId = caso.Id
+                        };
+
+                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.Individuos != null)
+                        {
+                            var existe = caso.Individuos.FirstOrDefault(i => i.ItemId == itemSelecionado.Id);
                             if (existe == null)
-                                caso.ItensFamiliares.Add(itemSelecionado);
+                                caso.Individuos.Add(individuo);
                         }
                         else
                         {
-                            if (caso.ItensFamiliares == null)
-                                caso.ItensFamiliares = new List<Item>();
+                            if (caso.Individuos == null)
+                                caso.Individuos = new List<IndividuoEmViolacao>();
 
-                            caso.ItensFamiliares.Add(itemSelecionado);
+                            caso.Individuos.Add(individuo);
                         }
                     }
                 }

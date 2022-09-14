@@ -9,6 +9,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     public DbSet<Organizacao> Organizacoes => Set<Organizacao>();
     public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<Item> Itens => Set<Item>();
+    public DbSet<ViolenciaSofrida> ViolenciasSofridas => Set<ViolenciaSofrida>();
     public DbSet<IndividuoEmViolacao> IndividuosEmViolacoes => Set<IndividuoEmViolacao>();
 
     public PontuaCasosContext(DbContextOptions<PontuaCasosContext> options) : base(options)
@@ -104,13 +105,36 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Item>()
-            .HasMany(i => i.Individuos)
-            .WithMany(v => v.Violencias)
-            .UsingEntity<ViolenciaSofrida>();
+        modelBuilder.Entity<IndividuoEmViolacao>()
+            .HasMany(i => i.SituacoesDeSaude)
+            .WithMany(s => s.IndividuosSaude)
+            .UsingEntity<Dictionary<string, object>>(
+                "SaudeIndividuos",
+                j => j
+                    .HasOne<Item>()
+                    .WithMany()
+                    .HasForeignKey("ItemSaudeId")
+                    .HasConstraintName("FK_SaudeIndividuos_Itens_ItemSaudeId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<IndividuoEmViolacao>()
+                    .WithMany()
+                    .HasForeignKey("IndividuoId")
+                    .HasConstraintName("FK_SaudeIndividuos_Individuos_IndividuoId")
+                    .OnDelete(DeleteBehavior.ClientCascade));
 
         modelBuilder.Entity<ViolenciaSofrida>()
-            .HasOne(v => v.Situacao)
+            .HasOne(vs => vs.Violencia)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<ViolenciaSofrida>()
+            .HasOne(vs => vs.IndividuoEmViolacao)
+            .WithMany(i => i.ViolenciasSofridas)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<ViolenciaSofrida>()
+            .HasOne(vs => vs.Situacao)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
     }
