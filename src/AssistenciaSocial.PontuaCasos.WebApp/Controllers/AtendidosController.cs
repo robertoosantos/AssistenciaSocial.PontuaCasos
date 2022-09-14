@@ -63,7 +63,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
-            var caso = _context.Casos.Include(c => c.Itens).ThenInclude(i => i.Categoria).First(c => caso_id != null && c.Id == int.Parse(caso_id));
+            var caso = _context.Casos.Include(c => c.ItensFamiliares).ThenInclude(i => i.Categoria).First(c => caso_id != null && c.Id == int.Parse(caso_id));
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
             foreach (string idItem in Request.Form["Itens"])
@@ -76,18 +76,18 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
                     if (itemSelecionado != null && itemSelecionado.Categoria != null)
                     {
-                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.Itens != null)
+                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.ItensFamiliares != null)
                         {
-                            var existe = caso.Itens.FirstOrDefault(i => i.Id == itemSelecionado.Id);
+                            var existe = caso.ItensFamiliares.FirstOrDefault(i => i.Id == itemSelecionado.Id);
                             if (existe == null)
-                                caso.Itens.Add(itemSelecionado);
+                                caso.ItensFamiliares.Add(itemSelecionado);
                         }
                         else
                         {
-                            if (caso.Itens == null)
-                                caso.Itens = new List<Item>();
+                            if (caso.ItensFamiliares == null)
+                                caso.ItensFamiliares = new List<Item>();
 
-                            caso.Itens.Add(itemSelecionado);
+                            caso.ItensFamiliares.Add(itemSelecionado);
                         }
                     }
                 }

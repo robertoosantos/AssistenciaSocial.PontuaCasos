@@ -68,11 +68,11 @@
 </div>
 <div>
     <h4>Sobre a família</h4>
-    <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Itens" />
+    <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.ItensFamiliares" />
     <h4>Indivíduos em Violação</h4>
     <table>
     @{
-        foreach (var individuo in Model.Individuos)
+        @* foreach (var individuo in Model.Individuos)
         {
             var violencias = individuo.Violencias;
             var saude = individuo.Saude; 
@@ -81,10 +81,10 @@
 
             <tr>
                 <td rowspan="@linhas">@individuo.Titulo</td>
-                @foreach (var violencia in individuo.Violencias)
+                @foreach (var violencia in individuo.ViolenciasSofridas)
                 {
                     @:</tr><tr>
-                    <td>@violencia.Titulo</td>
+                    <td>@violencia.Violencia.Titulo</td>
                     <td>@violencia.Situacao</td>
                 }
 
@@ -94,7 +94,7 @@
                     <td>@itemSaude.Titulo</td>
                 }
             </tr>
-        }
+        } *@
     }
     </table>
 </div>

@@ -9,8 +9,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     public DbSet<Organizacao> Organizacoes => Set<Organizacao>();
     public DbSet<Caso> Casos => Set<Caso>();
     public DbSet<Item> Itens => Set<Item>();
-    public DbSet<IndividuoEmViolacao> IndividuosEmViolacao => Set<IndividuoEmViolacao>();
-    public DbSet<Violencia> Violencias => Set<Violencia>();
+    public DbSet<IndividuoEmViolacao> IndividuosEmViolacoes => Set<IndividuoEmViolacao>();
 
     public PontuaCasosContext(DbContextOptions<PontuaCasosContext> options) : base(options)
     {
@@ -38,58 +37,6 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .HasForeignKey(i => i.CategoriaId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        modelBuilder.Entity<Caso>()
-            .HasOne(c => c.ModificadoPor)
-            .WithMany()
-            .OnDelete(DeleteBehavior.NoAction);
-
-
-        modelBuilder.Entity<Violencia>()
-            .HasOne(v => v.Situacao)
-            .WithMany()
-            .OnDelete(DeleteBehavior.NoAction);
-
-        modelBuilder.Entity<IndividuoEmViolacao>()
-            .HasMany(i => i.Saude)
-            .WithMany(s => s.Individuos)
-            .UsingEntity("SaudeIndiduosEmViolacao");
-
-        modelBuilder.Entity<Violencia>()
-            .HasMany(v => v.Individuos)
-            .WithMany(i => i.Violencias)
-            .UsingEntity<Dictionary<string, object>>(
-                "ViolenciasIndividuos",
-                j => j
-                    .HasOne<IndividuoEmViolacao>()
-                    .WithMany()
-                    .HasForeignKey("IndividuoId")
-                    .HasConstraintName("FK_ViolenciasIndividuos_Individuos_IndividuoId")
-                    .OnDelete(DeleteBehavior.ClientCascade),
-                    j => j
-                    .HasOne<Violencia>()
-                    .WithMany()
-                    .HasForeignKey("ViolenciaId")
-                    .HasConstraintName("FK_ViolenciasIndividuos_Violencias_ViolenciaId")
-                    .OnDelete(DeleteBehavior.Cascade));
-
-        modelBuilder.Entity<Caso>()
-            .HasMany(c => c.Itens)
-            .WithMany(i => i.Casos)
-            .UsingEntity<Dictionary<string, object>>(
-                "ItensCasos",
-                j => j
-                    .HasOne<Item>()
-                    .WithMany()
-                    .HasForeignKey("ItemId")
-                    .HasConstraintName("FK_ItensCasos_Itens_ItemId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j
-                    .HasOne<Caso>()
-                    .WithMany()
-                    .HasForeignKey("CasoId")
-                    .HasConstraintName("FK_ItensCasos_Casos_CasoId")
-                    .OnDelete(DeleteBehavior.ClientCascade));
-
         modelBuilder.Entity<Organizacao>()
             .HasOne(o => o.CriadoPor)
             .WithMany()
@@ -99,7 +46,6 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .HasOne(o => o.ModificadoPor)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
-
 
         modelBuilder.Entity<Organizacao>()
             .HasMany(o => o.Administradores)
@@ -124,5 +70,48 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .HasMany(u => u.Organizacoes)
             .WithMany(o => o.Membros)
             .UsingEntity(mo => mo.ToTable("MembrosOrganizacao"));
+        
+        modelBuilder.Entity<Caso>()
+            .HasOne(c => c.ModificadoPor)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Caso>()
+            .HasMany(c => c.Individuos)
+            .WithOne(i => i.Caso)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Caso>()
+            .HasMany(c => c.ItensFamiliares)
+            .WithMany(i => i.Casos)
+            .UsingEntity<Dictionary<string, object>>(
+                "ItensFamiliares",
+                j => j
+                    .HasOne<Item>()
+                    .WithMany()
+                    .HasForeignKey("ItemFamiliarId")
+                    .HasConstraintName("FK_ItensFamiliares_Itens_ItemFamiliarId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<Caso>()
+                    .WithMany()
+                    .HasForeignKey("CasoId")
+                    .HasConstraintName("FK_ItensFamiliares_Casos_CasoId")
+                    .OnDelete(DeleteBehavior.ClientCascade));
+
+        modelBuilder.Entity<IndividuoEmViolacao>()
+            .HasOne(i => i.Item)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        modelBuilder.Entity<Item>()
+            .HasMany(i => i.Individuos)
+            .WithMany(v => v.Violencias)
+            .UsingEntity<ViolenciaSofrida>();
+
+        modelBuilder.Entity<ViolenciaSofrida>()
+            .HasOne(v => v.Situacao)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

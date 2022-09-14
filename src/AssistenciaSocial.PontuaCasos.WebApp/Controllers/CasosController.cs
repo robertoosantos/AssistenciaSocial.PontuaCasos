@@ -36,13 +36,13 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var caso = await _context.Casos
-                .Include(c => c.Itens)
+                /* .Include(c => c.ItensFamiliares)
                 .ThenInclude(i => i.Categoria)
                 .Include(c => c.Individuos)
-                .ThenInclude(i => i.Violencias)
+                .ThenInclude(i => i.ViolenciasSofridas)
                 .ThenInclude(v => v.Situacao)
                 .Include(c => c.Individuos)
-                .ThenInclude(i => i.Saude)
+                .ThenInclude(i => i.Saude) */
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (caso == null)
@@ -52,7 +52,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var categorias = new Dictionary<int, Item>(); 
 
-            foreach (var item in caso.Itens)
+            foreach (var item in caso.ItensFamiliares)
             {
                 if (item.CategoriaId != null)
                 {
@@ -75,7 +75,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 }
             }
 
-            caso.Itens = categorias.Values.ToList();
+            caso.ItensFamiliares = categorias.Values.ToList();
 
             return View(caso);
         }
@@ -102,10 +102,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
                 if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
                 {
-                    if (caso.Itens == null)
-                        caso.Itens = new List<Item>();
+                    if (caso.ItensFamiliares == null)
+                        caso.ItensFamiliares = new List<Item>();
 
-                    caso.Itens.Add(itemSelecionado);
+                    caso.ItensFamiliares.Add(itemSelecionado);
                 }
             }
 

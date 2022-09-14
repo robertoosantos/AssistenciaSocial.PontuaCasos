@@ -15,7 +15,7 @@ public class Caso : ModelBaseControle
     public string Prontuario { get; set; } = null!;
     public bool Ativo { get; set; }
     public Organizacao? Organizacao { get; set; }
-    public List<Item>? Itens { get; set; }
+    public List<Item>? ItensFamiliares { get; set; }
     public List<IndividuoEmViolacao>? Individuos { get; set; }
     [NotMapped]
     public List<Item>? Categorias { get; set; }
@@ -24,9 +24,9 @@ public class Caso : ModelBaseControle
     {
         int pontos = 0;
 
-        if (Itens != null)
+        if (ItensFamiliares != null)
         {
-            foreach (var item in Itens)
+            foreach (var item in ItensFamiliares)
             {
                 if (item == null || item.Categoria == null)
                     throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
