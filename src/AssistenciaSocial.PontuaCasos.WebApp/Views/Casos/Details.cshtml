@@ -72,29 +72,12 @@
     <h4>Indivíduos em Violação</h4>
     <table>
     @{
-        @* foreach (var individuo in Model.Individuos)
+        foreach (var individuo in Model.Individuos)
         {
-            var violencias = individuo.Violencias;
-            var saude = individuo.Saude; 
-
-            var linhas = violencias.Count() + saude.Count();
-
             <tr>
-                <td rowspan="@linhas">@individuo.Titulo</td>
-                @foreach (var violencia in individuo.ViolenciasSofridas)
-                {
-                    @:</tr><tr>
-                    <td>@violencia.Violencia.Titulo</td>
-                    <td>@violencia.Situacao</td>
-                }
-
-                @foreach (var itemSaude in individuo.Saude)
-                {
-                    @:</tr><tr>
-                    <td>@itemSaude.Titulo</td>
-                }
+                <td>@Html.DisplayFor(model => individuo.Item.Titulo)</td>
             </tr>
-        } *@
+        }
     }
     </table>
 </div>

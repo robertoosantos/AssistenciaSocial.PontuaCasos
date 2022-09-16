@@ -21,17 +21,20 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Itens/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string? id)
         {
-            if (id == null || _context.Itens == null)
+            if (id == null || _context.IndividuosEmViolacoes == null)
             {
                 return NotFound();
             }
 
-            var item = await _context.Itens
-                .Include(i => i.CriadoPor)
-                .Include(i => i.ModificadoPor)
+            var item = await _context.IndividuosEmViolacoes
+                .Include(i => i.Item)
+                .ThenInclude(i => i.CriadoPor)
+                .Include(i => i.Item)
+                .ThenInclude(i => i.ModificadoPor)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (item == null)
             {
                 return NotFound();
@@ -45,7 +48,13 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && !i.UnicaPorFamilia).ToList();
+            List<Item> itens = ConsultarItens();
+            return View(itens);
+        }
+
+        private List<Item> ConsultarItens()
+        {
+            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorAtendido).ToList();
             foreach (var item in itens)
             {
                 if (item.Itens != null)
@@ -53,7 +62,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     item.Itens.Insert(0, new Item { Id = 0, Titulo = "" });
                 }
             }
-            return View(itens);
+
+            return itens;
         }
 
         // POST: Itens/Create
@@ -65,6 +75,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             var caso = _context.Casos.Include(c => c.Individuos).First(c => caso_id != null && c.Id == int.Parse(caso_id));
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+            IndividuoEmViolacao? individuo = null;
 
             foreach (string idItem in Request.Form["Itens"])
             {
@@ -76,25 +87,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
                     if (itemSelecionado != null && itemSelecionado.Categoria != null)
                     {
-                        var individuo = new IndividuoEmViolacao
+                        if (caso.Individuos == null)
+                            caso.Individuos = new List<IndividuoEmViolacao>();
+
+                        individuo = new IndividuoEmViolacao
                         {
                             ItemId = itemSelecionado.Id,
                             CasoId = caso.Id
                         };
 
-                        if (itemSelecionado.Categoria.UnicaPorAtendido && caso.Individuos != null)
-                        {
-                            var existe = caso.Individuos.FirstOrDefault(i => i.ItemId == itemSelecionado.Id);
-                            if (existe == null)
-                                caso.Individuos.Add(individuo);
-                        }
-                        else
-                        {
-                            if (caso.Individuos == null)
-                                caso.Individuos = new List<IndividuoEmViolacao>();
-
-                            caso.Individuos.Add(individuo);
-                        }
+                        caso.Individuos.Add(individuo);
                     }
                 }
             }
@@ -106,13 +108,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             ModelState.Clear();
             if (!TryValidateModel(caso, nameof(caso)))
             {
-                return View(caso);
+                return View(ConsultarItens());
             }
 
             _context.Update(caso);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Casos", new { id = caso_id });
+            if (individuo != null)
+                return RedirectToAction(nameof(Details), new { id = individuo.Id });
+            else
+                return View(ConsultarItens());
         }
 
         // GET: Itens/Edit/5

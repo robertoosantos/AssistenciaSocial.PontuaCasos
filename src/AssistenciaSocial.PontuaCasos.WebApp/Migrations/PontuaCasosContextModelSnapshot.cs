@@ -73,7 +73,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("OrganizacaoId");
 
-                    b.ToTable("Casos");
+                    b.ToTable("Casos", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.IndividuoEmViolacao", b =>
@@ -93,7 +93,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("IndividuosEmViolacoes");
+                    b.ToTable("IndividuosEmViolacoes", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", b =>
@@ -158,7 +158,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("RelacionadoAoId");
 
-                    b.ToTable("Itens");
+                    b.ToTable("Itens", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
@@ -193,7 +193,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ModificadoPorId");
 
-                    b.ToTable("Organizacoes");
+                    b.ToTable("Organizacoes", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", b =>
@@ -289,7 +289,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ViolenciaId");
 
-                    b.ToTable("ViolenciasSofridas");
+                    b.ToTable("ViolenciasSofridas", (string)null);
                 });
 
             modelBuilder.Entity("ItensFamiliares", b =>
@@ -304,7 +304,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemFamiliarId");
 
-                    b.ToTable("ItensFamiliares");
+                    b.ToTable("ItensFamiliares", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -471,7 +471,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemSaudeId");
 
-                    b.ToTable("SaudeIndividuos");
+                    b.ToTable("SaudeIndividuos", (string)null);
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Caso", b =>
