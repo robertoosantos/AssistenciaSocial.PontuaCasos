@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
 public class Caso : ModelBaseControle
 {
     public int Id { get; set; }
+    [ValidateNever]
     public int Pontos
     {
         get { return CalcularPontos(); }

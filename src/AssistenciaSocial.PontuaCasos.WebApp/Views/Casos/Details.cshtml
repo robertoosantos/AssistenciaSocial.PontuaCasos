@@ -87,12 +87,14 @@
                 foreach (var individuo in Model.Individuos)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(model => individuo.Item.Titulo) <span class="pontos">(@Html.DisplayFor(model => individuo.Item.Pontos))</span></td>
+                        <td>@Html.DisplayFor(model => individuo.Item.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
+                        individuo.Item.Pontos))</span></td>
                         <td>
                             <ul class="list-unstyled">
                                 @foreach (var violencia in individuo.ViolenciasSofridas)
                                 {
-                                    <li>@Html.DisplayFor(model => violencia.Violencia.Titulo) <span class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
+                                    <li>@Html.DisplayFor(model => violencia.Violencia.Titulo) <span
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
                                 }
                             </ul>
                         </td>
@@ -104,8 +106,11 @@
                                     <li>
                                         @if (violencia.Situacao != null)
                                         {
-                                            @Html.DisplayFor(model => violencia.Situacao.Titulo) <span class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
-                                        } else {
+                                            @Html.DisplayFor(model => violencia.Situacao.Titulo) <span
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
+                                        }
+                                        else
+                                        {
                                             <span class="fw-lighter">Desconhecida</span>
                                         }
                                     </li>
@@ -116,16 +121,32 @@
                             <ul class="list-unstyled">
                                 @foreach (var saude in individuo.SituacoesDeSaude)
                                 {
-                                    <li>@Html.DisplayFor(model => saude.Titulo) <span class="pontos">(@Html.DisplayFor(model => saude.Pontos))</span></li>
+                                    <li>@Html.DisplayFor(model => saude.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
+                                saude.Pontos))</span></li>
                                 }
                             </ul>
                         </td>
                         <td>
-                            <a asp-action="Create" asp-controller="Violencias" asp-route-individuo_id="@individuo.Id">Adicionar
-                                Violências</a>
-                            | <a asp-action="Create" asp-controller="Saude" asp-route-individuo_id="@individuo.Id">Adicionar
-                                Saúde</a>
-                            | <a asp-action="Delete" asp-controller="Individuos" asp-route-id="@individuo.Id">Remover</a>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@individuo.Id">Atualizar
+                                        Indivíduo</a>
+                                </li>
+                                <li>
+                                    <a asp-action="Create" asp-controller="Violencias"
+                                asp-route-individuo_id="@individuo.Id">Adicionar
+                                        Violências</a>
+                                </li>
+                                <li>
+                                    <a asp-action="Create" asp-controller="Saude"
+                                asp-route-individuo_id="@individuo.Id">Adicionar
+                                        Saúde</a>
+                                </li>
+                                <li>
+                                    <a asp-action="Delete" asp-controller="Individuos" asp-route-id="@individuo.Id">Remover
+                                        Indivíduo</a>
+                                </li>
+                            </ul>
                         </td>
                     </tr>
                 }
