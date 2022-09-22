@@ -121,7 +121,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
                     .WithMany()
                     .HasForeignKey("IndividuoId")
                     .HasConstraintName("FK_SaudeIndividuos_Individuos_IndividuoId")
-                    .OnDelete(DeleteBehavior.ClientCascade));
+                    .OnDelete(DeleteBehavior.Cascade));
 
         modelBuilder.Entity<ViolenciaSofrida>()
             .HasOne(vs => vs.Violencia)
