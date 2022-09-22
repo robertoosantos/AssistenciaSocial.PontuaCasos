@@ -68,17 +68,69 @@
 </div>
 <div>
     <h4>Sobre a família</h4>
+    <hr />
     <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.ItensFamiliares" />
     <h4>Indivíduos em Violação</h4>
-    <table>
-    @{
-        foreach (var individuo in Model.Individuos)
-        {
+    <hr />
+    <table class="table">
+        <thead>
             <tr>
-                <td>@Html.DisplayFor(model => individuo.Item.Titulo)</td>
+                <th>Ciclo de Vida</th>
+                <th>Violências</th>
+                <th>Situações</th>
+                <th>Saúde</th>
+                <th>Ações</th>
             </tr>
-        }
-    }
+        </thead>
+        <tbody>
+            @{
+                foreach (var individuo in Model.Individuos)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(model => individuo.Item.Titulo)</td>
+                        <td>
+                            <ul class="list-unstyled">
+                                @foreach (var violencia in individuo.ViolenciasSofridas)
+                                {
+                                    <li>@Html.DisplayFor(model => violencia.Violencia.Titulo)</li>
+                                }
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="list-unstyled">
+                                @foreach (var violencia in individuo.ViolenciasSofridas)
+                                {
+
+                                    <li>
+                                        @if (violencia.Situacao != null)
+                                        {
+                                            @Html.DisplayFor(model => violencia.Situacao.Titulo)
+                                        } else {
+                                            <span class="fw-lighter">Desconhecida</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                @foreach (var saude in individuo.SituacoesDeSaude)
+                                {
+                                    <li>@Html.DisplayFor(model => saude.Titulo)</li>
+                                }
+                            </ul>
+                        </td>
+                        <td>
+                            <a asp-action="Create" asp-controller="Violencias" asp-route-individuo_id="@individuo.Id">Adicionar
+                                Violências</a>
+                            | <a asp-action="Create" asp-controller="Atendidos" asp-route-individuo_id="@individuo.Id">Adicionar
+                                Saúde</a>
+                            | <a asp-action="Delete" asp-controller="Individuos" asp-route-id="@individuo.Id">Remover</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
     </table>
 </div>
 <div>

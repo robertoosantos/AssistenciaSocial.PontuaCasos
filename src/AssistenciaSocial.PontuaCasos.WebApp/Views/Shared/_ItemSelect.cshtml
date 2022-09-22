@@ -14,7 +14,7 @@
             @foreach (var item in Model)
             {
                     <td>
-                        @Html.DropDownList("Itens", new SelectList(item.Itens, "Id", "Titulo"))
+                        @Html.DropDownList(item.Titulo, new SelectList(item.Itens.OrderByDescending(i => i.Pontos), "Id", "Titulo"))
                     </td>
             }
         </tr>
