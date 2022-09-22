@@ -71,7 +71,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .HasMany(u => u.Organizacoes)
             .WithMany(o => o.Membros)
             .UsingEntity(mo => mo.ToTable("MembrosOrganizacao"));
-        
+
         modelBuilder.Entity<Caso>()
             .HasOne(c => c.ModificadoPor)
             .WithMany()
@@ -131,11 +131,15 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<ViolenciaSofrida>()
             .HasOne(vs => vs.IndividuoEmViolacao)
             .WithMany(i => i.ViolenciasSofridas)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ViolenciaSofrida>()
             .HasOne(vs => vs.Situacao)
             .WithMany()
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<ViolenciaSofrida>()
+            .HasIndex("IndividuoEmViolacaoId", "ViolenciaId")
+            .IsUnique();
     }
 }

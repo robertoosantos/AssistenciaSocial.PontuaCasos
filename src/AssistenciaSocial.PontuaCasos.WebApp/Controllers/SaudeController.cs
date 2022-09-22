@@ -88,7 +88,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             _context.Update(individuo);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                ViewData["Erro"] = "Este indivíduo já possui essa situação de saúde.";
+                return View(ConsultarItens());
+            }
 
             return RedirectToAction(nameof(Details), "Casos", new { id = individuo.Caso.Id });
         }

@@ -73,6 +73,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var idViolencia = int.Parse(Request.Form[ITENS_VIOLENCIAS][0]);
             var idSituacao = int.Parse(Request.Form[ITENS_SITUACAO_VIOLENCIAS][0]);
 
+            if (idViolencia == 0)
+            {
+                ViewData["Erro"] = "Selecione uma violência.";
+                return View(ConsultarItens());
+            }
+
             var violencia = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idViolencia);
             var situacao = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == idSituacao);
 
@@ -96,7 +102,16 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             _context.Update(individuo);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                ViewData["Erro"] = "Este indivíduo já possui registro dessa violência.";
+                return View(ConsultarItens());
+            }
 
             return RedirectToAction(nameof(Details), "Casos", new { id = individuo.Caso.Id });
         }
