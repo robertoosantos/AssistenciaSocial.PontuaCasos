@@ -7,12 +7,12 @@
             <tr>
                 <td>
                     <span class="fw-bold fs-5">@Html.DisplayFor(modelItem => item.Titulo)</span> <span
-                    style="font-size: 0.8em;">(multiplicador: @item.Pontos)</span>
+                    class="pontos">(@item.Pontos)</span>
                 </td>
                 @foreach (var subitem in item.Itens)
                 {
                     <td>
-                        <p>@subitem.Titulo <span style="font-size: 0.8em;">(@subitem.Pontos pontos)</span></p>
+                        <p>@subitem.Titulo <span class="pontos">(@subitem.Pontos)</span></p>
                     </td>
                 }
             </tr>

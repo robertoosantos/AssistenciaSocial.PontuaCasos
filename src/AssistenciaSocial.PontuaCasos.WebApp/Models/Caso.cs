@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
@@ -10,6 +11,7 @@ public class Caso : ModelBaseControle
 
     public int Id { get; set; }
     public int Pontos { get; set; }
+    [DisplayName("Responsável Familiar")]
     public string ResponsavelFamiliar { get; set; } = null!;
     public string Titulo { get; set; } = null!;
     public string Prontuario { get; set; } = null!;
