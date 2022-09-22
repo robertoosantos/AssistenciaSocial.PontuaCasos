@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
 public class Caso : ModelBaseControle
 {
-    // TODO: indivíduos devem vir antes da questão familiar
-    // TODO: Incluir indivíduos em violação
-    // TODO: violências dos indivíduos podem ter frequências diferentes Caso > n Indivíduos > n violências - frequência
-
     public int Id { get; set; }
-    public int Pontos { get; set; }
+    public int Pontos
+    {
+        get { return CalcularPontos(); }
+    }
+
     [DisplayName("Responsável Familiar")]
     public string ResponsavelFamiliar { get; set; } = null!;
     public string Titulo { get; set; } = null!;
@@ -22,7 +22,7 @@ public class Caso : ModelBaseControle
     [NotMapped]
     public List<Item>? Categorias { get; set; }
 
-    internal void CalcularPontos()
+    internal int CalcularPontos()
     {
         int pontos = 0;
 
@@ -30,13 +30,47 @@ public class Caso : ModelBaseControle
         {
             foreach (var item in ItensFamiliares)
             {
-                if (item == null || item.Categoria == null)
+                if (item == null || (!item.ECategoria && item.Categoria == null))
                     throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
-                
+
                 pontos += item.Categoria.Pontos * item.Pontos;
             }
         }
 
-        this.Pontos = pontos;
+        if (Individuos != null)
+        {
+            foreach (var individuo in Individuos)
+            {
+                if (individuo.Item == null || individuo.Item.Categoria == null)
+                    throw new ApplicationException("Necessário carregar as categorias dos indivíduos antes de calcular a pontuação do caso.");
+
+                pontos += individuo.Item.Categoria.Pontos * individuo.Item.Pontos;
+
+                if (individuo.ViolenciasSofridas != null)
+                {
+                    foreach (var violencia in individuo.ViolenciasSofridas)
+                    {
+                        var itemViolencia = violencia.Violencia;
+
+                        if (itemViolencia.Categoria == null)
+                            throw new ApplicationException("Necessário carregar as categorias das violências antes de calcular a pontuação do caso.");
+
+                        var pontosCategoria = itemViolencia.Categoria.Pontos;
+                        int pontosSituacao = 0;
+                        int pontosSituacaoAtual = 0;
+
+                        if (violencia.Situacao != null && violencia.Situacao.Categoria != null)
+                        {
+                            pontosSituacao = violencia.Situacao.Categoria.Pontos;
+                            pontosSituacaoAtual = violencia.Situacao.Pontos;
+                        }
+
+                        pontos += pontosCategoria * itemViolencia.Pontos + pontosSituacao * pontosSituacaoAtual;
+                    }
+                }
+            }
+        }
+
+        return pontos;
     }
 }

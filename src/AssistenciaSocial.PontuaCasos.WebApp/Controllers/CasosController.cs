@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
 
@@ -22,7 +17,22 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             return _context.Casos != null ?
-                        View(await _context.Casos.ToListAsync()) :
+                        View(await _context.Casos
+                                .Include(c => c.ItensFamiliares)
+                                .ThenInclude(i => i.Categoria)
+                                .Include(c => c.Individuos)
+                                .ThenInclude(i => i.Item)
+                                .ThenInclude(i => i.Categoria)
+                                .Include(c => c.Individuos)
+                                .ThenInclude(i => i.ViolenciasSofridas)
+                                .ThenInclude(v => v.Violencia)
+                                .ThenInclude(v => v.Categoria)
+                                .Include(c => c.Individuos)
+                                .ThenInclude(i => i.ViolenciasSofridas)
+                                .ThenInclude(v => v.Situacao)
+                                .Include(c => c.Individuos)
+                                .ThenInclude(i => i.SituacoesDeSaude)
+                                .ToListAsync()) :
                         Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
         }
 
@@ -37,16 +47,20 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var caso = await _context.Casos
                 .Include(c => c.ItensFamiliares)
+                .ThenInclude(i => i.Categoria)
                 .Include(c => c.Individuos)
                 .ThenInclude(i => i.Item)
+                .ThenInclude(i => i.Categoria)
                 .Include(c => c.Individuos)
                 .ThenInclude(i => i.ViolenciasSofridas)
                 .ThenInclude(v => v.Violencia)
+                .ThenInclude(v => v.Categoria)
                 .Include(c => c.Individuos)
                 .ThenInclude(i => i.ViolenciasSofridas)
                 .ThenInclude(v => v.Situacao)
                 .Include(c => c.Individuos)
                 .ThenInclude(i => i.SituacoesDeSaude)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (caso == null)
@@ -54,7 +68,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return NotFound();
             }
 
-            var categorias = new Dictionary<int, Item>(); 
+            var categorias = new Dictionary<int, Item>();
 
             foreach (var item in caso.ItensFamiliares)
             {
@@ -79,7 +93,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 }
             }
 
-            caso.ItensFamiliares = categorias.Values.ToList();
+            caso.Categorias = categorias.Values.ToList();
 
             return View(caso);
         }

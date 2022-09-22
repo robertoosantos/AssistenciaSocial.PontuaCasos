@@ -1,21 +1,18 @@
 @model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
 
-<table class="table">
-    <tbody>
-        @foreach (var item in Model.Where(m => m.UnicaPorFamilia).ToList())
-        {
-            <tr>
-                <td>
-                    <span class="fw-bold fs-5">@Html.DisplayFor(modelItem => item.Titulo)</span> <span
-                    class="pontos">(@item.Pontos)</span>
-                </td>
-                @foreach (var subitem in item.Itens)
-                {
-                    <td>
-                        <p>@subitem.Titulo <span class="pontos">(@subitem.Pontos)</span></p>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
+@foreach (var item in Model.Where(m => m.UnicaPorFamilia).ToList())
+{
+    <dl class="row">
+    <dt class="col-sm-2">
+        @Html.DisplayFor(modelItem => item.Titulo) <span
+            class="pontos">(@item.Pontos)</span>
+    </dt>
+    <dd class="col-sm-10">
+        @foreach (var subitem in item.Itens)
+            {
+                <p>@subitem.Titulo <span class="pontos">(@subitem.Pontos)</span></p>
+            }
+        </dd>
+    </dl>
+}
 </table>
