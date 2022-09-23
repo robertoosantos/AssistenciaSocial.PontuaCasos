@@ -15,4 +15,8 @@ public class IndividuoEmViolacao
     public Caso? Caso { get; set; }
     public List<Item>? SituacoesDeSaude { get; set; }
     public List<ViolenciaSofrida>? ViolenciasSofridas { get; set; }
+    [NotMapped]
+    public List<Item>? OpcoesViolencias { get; set; }
+    [NotMapped]
+    public List<Item>? OpcoesSaude { get; set; }
 }

@@ -134,21 +134,29 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Itens/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string? id)
         {
             if (id == null || _context.Itens == null)
             {
                 return NotFound();
             }
 
-            var item = await _context.Itens.FindAsync(id);
-            if (item == null)
+            var individuo = await _context.IndividuosEmViolacoes
+                            .Include(i => i.Item)
+                            .Include(i => i.Caso)
+                            .Include(i => i.ViolenciasSofridas)
+                            .Include(i => i.SituacoesDeSaude)
+                            .SingleOrDefaultAsync(i => i.Id == id);
+
+            individuo.OpcoesViolencias = ViolenciasController.ConsultarItens(_context);
+            individuo.OpcoesSaude = SaudeController.ConsultarItens(_context);
+
+            if (individuo == null)
             {
                 return NotFound();
             }
-            ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
-            ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);
-            return View(item);
+
+            return View(individuo);
         }
 
         // POST: Itens/Edit/5
@@ -203,7 +211,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var item = await _context.IndividuosEmViolacoes
                 .Include(i => i.Item)
                 .FirstOrDefaultAsync(m => m.Id == id);
-                
+
             if (item == null)
             {
                 return NotFound();

@@ -116,11 +116,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return RedirectToAction(nameof(Details), "Casos", new { id = individuo.Caso.Id });
         }
 
-        private List<Item> ConsultarItens()
+        private List<Item> ConsultarItens() {
+            return ConsultarItens(_context);
+        }
+
+        public static List<Item> ConsultarItens(PontuaCasosContext context)
         {
             var filtro = new List<string> { ITENS_VIOLENCIAS, ITENS_SITUACAO_VIOLENCIAS };
 
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => filtro.Contains(i.Titulo)).OrderByDescending(i => i.Pontos).ToList();
+            var itens = context.Itens.Include(i => i.Itens).Where(i => filtro.Contains(i.Titulo)).OrderByDescending(i => i.Pontos).ToList();
 
             foreach (var item in itens)
             {

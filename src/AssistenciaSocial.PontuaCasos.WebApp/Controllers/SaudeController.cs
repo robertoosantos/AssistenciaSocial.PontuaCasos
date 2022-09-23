@@ -104,18 +104,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         private List<Item> ConsultarItens()
         {
-
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Titulo == ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
-
-            foreach (var item in itens)
-            {
-                if (item.Itens != null)
-                {
-                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
-                }
-            }
-
-            return itens;
+            return ConsultarItens(_context);
         }
 
         // GET: Itens/Edit/5
@@ -175,6 +164,21 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);
             return View(item);
+        }
+
+        internal static List<Item> ConsultarItens(PontuaCasosContext context)
+        {
+            var itens = context.Itens.Include(i => i.Itens).Where(i => i.Titulo == ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
+
+            foreach (var item in itens)
+            {
+                if (item.Itens != null)
+                {
+                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
+                }
+            }
+
+            return itens;
         }
 
         // GET: Itens/Delete/5
