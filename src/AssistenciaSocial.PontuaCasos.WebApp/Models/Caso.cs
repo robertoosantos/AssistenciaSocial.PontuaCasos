@@ -24,7 +24,7 @@ public class Caso : ModelBaseControle
     [NotMapped]
     public List<Item>? Categorias { get; set; }
 
-    internal int CalcularPontos()
+    private int CalcularPontos()
     {
         int pontos = 0;
 
@@ -68,6 +68,17 @@ public class Caso : ModelBaseControle
                         }
 
                         pontos += pontosCategoria * itemViolencia.Pontos + pontosSituacao * pontosSituacaoAtual;
+                    }
+                }
+
+                if (individuo.SituacoesDeSaude != null)
+                {
+                    foreach (var saude in individuo.SituacoesDeSaude)
+                    {
+                        if (saude.Categoria == null)
+                            throw new ApplicationException("Necessário carregar as categorias das condições do indivíduo antes de calcular a pontuação do caso.");
+
+                        pontos += saude.Categoria.Pontos * saude.Pontos;
                     }
                 }
             }

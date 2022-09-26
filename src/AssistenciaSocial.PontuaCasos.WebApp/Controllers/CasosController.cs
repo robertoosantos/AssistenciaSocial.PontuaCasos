@@ -18,21 +18,23 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             return _context.Casos != null ?
                         View(await _context.Casos
-                                .Include(c => c.ItensFamiliares)
+                                .Include(c => c.ItensFamiliares!)
                                 .ThenInclude(i => i.Categoria)
-                                .Include(c => c.Individuos)
-                                .ThenInclude(i => i.Item)
+                                .Include(c => c.Individuos!)
+                                .ThenInclude(i => i.Item!)
                                 .ThenInclude(i => i.Categoria)
-                                .Include(c => c.Individuos)
-                                .ThenInclude(i => i.ViolenciasSofridas)
-                                .ThenInclude(v => v.Violencia)
+                                .Include(c => c.Individuos!)
+                                .ThenInclude(i => i.ViolenciasSofridas!)
+                                .ThenInclude(v => v.Violencia!)
                                 .ThenInclude(v => v.Categoria)
-                                .Include(c => c.Individuos)
-                                .ThenInclude(i => i.ViolenciasSofridas)
+                                .Include(c => c.Individuos!)
+                                .ThenInclude(i => i.ViolenciasSofridas!)
                                 .ThenInclude(v => v.Situacao)
                                 .ThenInclude(s => s.Categoria)
-                                .Include(c => c.Individuos)
-                                .ThenInclude(i => i.SituacoesDeSaude)
+                                .Include(c => c.Individuos!)
+                                .ThenInclude(i => i.SituacoesDeSaude!)
+                                .ThenInclude(ss => ss.Categoria)
+                                .AsSplitQuery()
                                 .ToListAsync()) :
                         Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
         }
@@ -61,7 +63,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .ThenInclude(v => v.Situacao!)
                 .ThenInclude(s => s.Categoria)
                 .Include(c => c.Individuos!)
-                .ThenInclude(i => i.SituacoesDeSaude)
+                .ThenInclude(i => i.SituacoesDeSaude!)
+                .ThenInclude(ss => ss.Categoria)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -134,7 +137,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             caso.CriadoPorId = user.Id;
             caso.ModificadoPorId = user.Id;
             caso.Ativo = true;
-            caso.CalcularPontos();
 
             if (user.Organizacoes != null)
                 caso.Organizacao = user.Organizacoes.First();

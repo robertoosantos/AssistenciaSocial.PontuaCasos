@@ -88,13 +88,14 @@
                 {
                     <tr>
                         <td>@Html.DisplayFor(model => individuo.Item.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
+                        individuo.Item.Categoria.Pontos) x @Html.DisplayFor(model =>
                         individuo.Item.Pontos))</span></td>
                         <td>
                             <ul class="list-unstyled">
                                 @foreach (var violencia in individuo.ViolenciasSofridas)
                                 {
                                     <li>@Html.DisplayFor(model => violencia.Violencia.Titulo) <span
-                                    class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Categoria.Pontos) x @Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
                                 }
                             </ul>
                         </td>
@@ -107,7 +108,7 @@
                                         @if (violencia.Situacao != null)
                                         {
                                             @Html.DisplayFor(model => violencia.Situacao.Titulo) <span
-                                    class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Categoria.Pontos) x @Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
                                         }
                                         else
                                         {
@@ -122,6 +123,7 @@
                                 @foreach (var saude in individuo.SituacoesDeSaude)
                                 {
                                     <li>@Html.DisplayFor(model => saude.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
+                                saude.Categoria.Pontos) x @Html.DisplayFor(model =>
                                 saude.Pontos))</span></li>
                                 }
                             </ul>

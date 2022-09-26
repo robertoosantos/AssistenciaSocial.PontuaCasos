@@ -103,7 +103,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             caso.ModificadoEm = DateTime.Now;
             caso.ModificadoPorId = user.Id;
-            caso.CalcularPontos();
 
             ModelState.Clear();
             if (!TryValidateModel(caso, nameof(caso)))
