@@ -1,0 +1,27 @@
+@model AssistenciaSocial.PontuaCasos.WebApp.Models.Item
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Saúde</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Titulo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Titulo)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" asp-route-individuo_id="@Context.Request.Query["individuo_id"]">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@Context.Request.Query["individuo_id"]">Back to List</a>
+    </form>
+</div

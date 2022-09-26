@@ -204,20 +204,22 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // POST: Itens/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, string? individuo_id)
         {
             if (_context.Itens == null)
             {
                 return Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
             }
-            var item = await _context.Itens.FindAsync(id);
-            if (item != null)
+            var individuo = await _context.IndividuosEmViolacoes.Include(i => i.SituacoesDeSaude).SingleOrDefaultAsync(i => i.Id == individuo_id);
+            if (individuo != null)
             {
-                item.Ativo = false;
+                int i = individuo.SituacoesDeSaude.FindIndex(s => s.Id == id);
+                individuo.SituacoesDeSaude.RemoveAt(i);
             }
 
+            _context.Update(individuo);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo_id });
         }
 
         private bool ItemExists(int id)

@@ -21,6 +21,8 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <h4>Violências</h4>
+            <hr />
             <table class="table form-group">
                 <thead>
                     <tr>
@@ -50,6 +52,8 @@
                     }
                 </tbody>
             </table>
+            <h4>Condições do Indivíduo em Violação</h4>
+            <hr />
             <table class="table form-group">
                 <thead>
                     <tr>
@@ -69,6 +73,9 @@
                                     @Html.DropDownList(item.Titulo, new SelectList(item.Itens!.OrderByDescending(i => i.Pontos), "Id", "Titulo", saude.Id))
                                 </td>
                             }
+                            <td>
+                                <a asp-action="Delete" asp-controller="Saude" asp-route-id="@saude.Id" asp-route-individuo_id="@Model.Id">Remover Condição</a>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -81,5 +88,5 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Details" asp-controller="Casos" asp-route-id="@Model.CasoId">Back to List</a>
 </div>
