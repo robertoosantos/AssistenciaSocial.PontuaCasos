@@ -7,8 +7,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class ViolenciasController : Controller
     {
-        private const string ITENS_VIOLENCIAS = "Violências";
-        private const string ITENS_SITUACAO_VIOLENCIAS = "Situações das Violências";
+        internal const string ITENS_VIOLENCIAS = "Violências";
+        internal const string ITENS_SITUACAO_VIOLENCIAS = "Situações das Violências";
         private readonly PontuaCasosContext _context;
 
         public ViolenciasController(PontuaCasosContext context)

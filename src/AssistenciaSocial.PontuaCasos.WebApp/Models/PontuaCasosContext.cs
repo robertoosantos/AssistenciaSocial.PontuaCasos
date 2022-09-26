@@ -126,6 +126,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<ViolenciaSofrida>()
             .HasOne(vs => vs.Violencia)
             .WithMany()
+            .HasForeignKey(vs => vs.ViolenciaId)
             .OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<ViolenciaSofrida>()
@@ -136,6 +137,7 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<ViolenciaSofrida>()
             .HasOne(vs => vs.Situacao)
             .WithMany()
+            .HasForeignKey(vs => vs.SituacaoId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<ViolenciaSofrida>()

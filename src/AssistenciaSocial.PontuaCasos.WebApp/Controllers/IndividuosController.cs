@@ -7,8 +7,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class IndividuosController : Controller
     {
-        private const string ITENS_VIOLENCIAS = "Violências";
-        private const string ITENS_SITUACAO_VIOLENCIAS = "Situações das Violências";
         private readonly PontuaCasosContext _context;
 
         public IndividuosController(PontuaCasosContext context)
@@ -50,9 +48,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            List<Item> itens = ConsultarItens();
 
-            return View(itens);
+            return View();
         }
 
         // POST: Itens/Create
@@ -70,13 +67,13 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(u => u.Organizacoes)
                 .First(u => User.Identity != null && u.Email == User.Identity.Name);
 
-            var idViolencia = int.Parse(Request.Form[ITENS_VIOLENCIAS][0]);
-            var idSituacao = int.Parse(Request.Form[ITENS_SITUACAO_VIOLENCIAS][0]);
+            var idViolencia = int.Parse(Request.Form[ViolenciasController.ITENS_VIOLENCIAS][0]);
+            var idSituacao = int.Parse(Request.Form[ViolenciasController.ITENS_SITUACAO_VIOLENCIAS][0]);
 
             if (idViolencia == 0)
             {
                 ViewData["Erro"] = "Selecione uma violência.";
-                return View(ConsultarItens());
+                return View();
             }
 
             var violencia = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idViolencia);
@@ -98,7 +95,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             ModelState.Clear();
             if (!TryValidateModel(individuo, nameof(individuo)))
             {
-                return View(ConsultarItens());
+                return View();
             }
 
             _context.Update(individuo);
@@ -110,27 +107,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             catch (DbUpdateException ex)
             {
                 ViewData["Erro"] = "Este indivíduo já possui registro dessa violência.";
-                return View(ConsultarItens());
+                return View();
             }
 
             return RedirectToAction(nameof(Details), "Casos", new { id = individuo.Caso.Id });
-        }
-
-        private List<Item> ConsultarItens()
-        {
-            var filtro = new List<string> { ITENS_VIOLENCIAS, ITENS_SITUACAO_VIOLENCIAS };
-
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => filtro.Contains(i.Titulo)).OrderByDescending(i => i.Pontos).ToList();
-
-            foreach (var item in itens)
-            {
-                if (item.Itens != null)
-                {
-                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
-                }
-            }
-
-            return itens;
         }
 
         // GET: Itens/Edit/5
@@ -140,16 +120,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 return NotFound();
             }
-
-            var individuo = await _context.IndividuosEmViolacoes
-                            .Include(i => i.Item)
-                            .Include(i => i.Caso)
-                            .Include(i => i.ViolenciasSofridas)
-                            .Include(i => i.SituacoesDeSaude)
-                            .SingleOrDefaultAsync(i => i.Id == id);
-
-            individuo.OpcoesViolencias = ViolenciasController.ConsultarItens(_context);
-            individuo.OpcoesSaude = SaudeController.ConsultarItens(_context);
+            IndividuoEmViolacao? individuo = await ConsultarIndividuos(id);
 
             if (individuo == null)
             {
@@ -159,45 +130,106 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return View(individuo);
         }
 
+        private async Task<IndividuoEmViolacao?> ConsultarIndividuos(string? id)
+        {
+            var individuo = await _context.IndividuosEmViolacoes
+                            .Include(i => i.Item)
+                            .Include(i => i.Caso)
+                            .Include(i => i.ViolenciasSofridas!)
+                            .ThenInclude(v => v.Violencia)
+                            .Include(i => i.ViolenciasSofridas!)
+                            .ThenInclude(v => v.Situacao)
+                            .Include(i => i.SituacoesDeSaude)
+                            .SingleOrDefaultAsync(i => i.Id == id);
+
+            if (individuo != null)
+            {
+                individuo.OpcoesViolencias = ViolenciasController.ConsultarItens(_context);
+                individuo.OpcoesSaude = SaudeController.ConsultarItens(_context);
+            }
+
+            return individuo;
+        }
+
         // POST: Itens/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Pontos,Ativo,UnicaPorFamilia,Categoria,CriadoEm,CriadoPorId,ModificadoPorId,ModificadoEm,OrganizacaoId,ItemId")] Item item)
+        public async Task<IActionResult> Edit(string id, [Bind("Id")] IndividuoEmViolacao individuo)
         {
-            if (id != item.Id)
+            if (id != individuo.Id)
             {
                 return NotFound();
             }
 
             var user = _context.Users.First(u => User.Identity != null && u.Email == User.Identity.Name);
-            item.ModificadoEm = DateTime.Now;
-            item.ModificadoPorId = user.Id;
+            var individuoDb = _context.IndividuosEmViolacoes
+                                .Include(i => i.Caso)
+                                .Include(i => i.ViolenciasSofridas)
+                                .Include(i => i.SituacoesDeSaude)
+                                .First(i => i.Id == id);
 
-            if (ModelState.IsValid)
+            individuoDb.Caso!.ModificadoEm = DateTime.Now;
+            individuoDb.Caso.ModificadoPorId = user.Id;
+
+            for (int i = 0; i < Request.Form[ViolenciasController.ITENS_VIOLENCIAS].Count; i++)
             {
-                try
+                var idViolencia = int.Parse(Request.Form[ViolenciasController.ITENS_VIOLENCIAS][i]);
+
+                if (idViolencia == 0 || idViolencia == int.MaxValue)
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    ViewData["Erro"] = "Selecione uma violência.";
+                    return View(ConsultarIndividuos(id));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ItemExists(item.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Details", "Categorias", new { id = item.CategoriaId });
+
+                individuoDb.ViolenciasSofridas![i].ViolenciaId = idViolencia;
             }
-            ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.CriadoPorId);
-            ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id", item.ModificadoPorId);
-            return View(item);
+
+            for (int i = 0; i < Request.Form[ViolenciasController.ITENS_SITUACAO_VIOLENCIAS].Count; i++)
+            {
+                var idSituacao = int.Parse(Request.Form[ViolenciasController.ITENS_SITUACAO_VIOLENCIAS][i]);
+
+                if (idSituacao != 0 && idSituacao != int.MaxValue)
+                {
+                    individuoDb.ViolenciasSofridas![i].SituacaoId = idSituacao;
+                } else {
+                    individuoDb.ViolenciasSofridas![i].SituacaoId = null;
+                }
+            }
+ 
+            for (int i = 0; i < Request.Form[SaudeController.ITENS_SAUDE].Count; i++)
+            {
+                var idSaude = int.Parse(Request.Form[SaudeController.ITENS_SAUDE][i]);
+                var saude = await _context.Itens.FirstAsync(s => s.Id == idSaude);
+
+                individuoDb.SituacoesDeSaude![i] = saude;
+            }
+
+            ModelState.Clear();
+            if (!TryValidateModel(individuo, nameof(individuo)))
+            {
+                return View(ConsultarIndividuos(id));
+            }
+
+            try
+            {
+                _context.Update(individuoDb);
+                await _context.SaveChangesAsync();
+            }   
+            catch (Exception ex)
+            {
+                if (!IndividuoExists(individuo.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(CasosController.Details), "Casos", new { id = individuoDb.CasoId });
         }
 
         // GET: Itens/Delete/5
@@ -243,9 +275,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return RedirectToAction(nameof(CasosController.Details), "Casos", new { id = casoId });
         }
 
-        private bool ItemExists(int id)
+        private bool IndividuoExists(string id)
         {
-            return (_context.Itens?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.IndividuosEmViolacoes?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

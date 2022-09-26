@@ -1,0 +1,26 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+
+@{
+    var titulo = Model.FirstOrDefault();
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            @foreach (var item in Model)
+            {
+                <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            @foreach (var item in Model)
+            {
+                    <td>
+                        @Html.DropDownList(item.Titulo, new SelectList(item.Itens.OrderByDescending(i => i.Pontos), "Id", "Titulo"))
+                    </td>
+            }
+        </tr>
+    </tbody>
+</table>

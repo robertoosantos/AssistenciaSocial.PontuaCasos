@@ -7,7 +7,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class SaudeController : Controller
     {
-        private const string ITENS_SAUDE = "Condições de Saúde do Violado";
+        internal const string ITENS_SAUDE = "Condições de Saúde do Violado";
         private readonly PontuaCasosContext _context;
 
         public SaudeController(PontuaCasosContext context)

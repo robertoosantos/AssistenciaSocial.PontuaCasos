@@ -21,14 +21,54 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            @foreach (var item in Model.ViolenciasSofridas)
-            {
-                <partial name="~/Views/Shared/_ItemSelect.cshtml" model="@Model.OpcoesViolencias" />
-            }
-            @foreach (var item in Model.SituacoesDeSaude)
-            {
-                <partial name="~/Views/Shared/_ItemSelect.cshtml" model="@Model.OpcoesSaude" />
-            }
+            <table class="table form-group">
+                <thead>
+                    <tr>
+                        @foreach (var item in Model.OpcoesViolencias!)
+                        {
+                            <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var violencia in Model.ViolenciasSofridas!)
+                    {
+                        <tr>
+                            @foreach (var item in Model.OpcoesViolencias)
+                            {
+                                var valor = violencia.Violencia.CategoriaId == item.Id ? violencia.Violencia : violencia.Situacao;
+
+                                <td>
+                                    @Html.DropDownList(item.Titulo, new SelectList(item.Itens!.OrderByDescending(i => i.Pontos), "Id", "Titulo", valor != null ? valor.Id : null))
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <table class="table form-group">
+                <thead>
+                    <tr>
+                        @foreach (var item in Model.OpcoesSaude!)
+                        {
+                            <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var saude in Model.SituacoesDeSaude!)
+                    {
+                        <tr>
+                            @foreach (var item in Model.OpcoesSaude)
+                            {
+                                <td>
+                                    @Html.DropDownList(item.Titulo, new SelectList(item.Itens!.OrderByDescending(i => i.Pontos), "Id", "Titulo", saude.Id))
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

@@ -30,6 +30,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                                 .Include(c => c.Individuos)
                                 .ThenInclude(i => i.ViolenciasSofridas)
                                 .ThenInclude(v => v.Situacao)
+                                .ThenInclude(s => s.Categoria)
                                 .Include(c => c.Individuos)
                                 .ThenInclude(i => i.SituacoesDeSaude)
                                 .ToListAsync()) :
@@ -46,19 +47,20 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var caso = await _context.Casos
-                .Include(c => c.ItensFamiliares)
+                .Include(c => c.ItensFamiliares!)
                 .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos)
-                .ThenInclude(i => i.Item)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.Item!)
                 .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos)
-                .ThenInclude(i => i.ViolenciasSofridas)
-                .ThenInclude(v => v.Violencia)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.ViolenciasSofridas!)
+                .ThenInclude(v => v.Violencia!)
                 .ThenInclude(v => v.Categoria)
-                .Include(c => c.Individuos)
-                .ThenInclude(i => i.ViolenciasSofridas)
-                .ThenInclude(v => v.Situacao)
-                .Include(c => c.Individuos)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.ViolenciasSofridas!)
+                .ThenInclude(v => v.Situacao!)
+                .ThenInclude(s => s.Categoria)
+                .Include(c => c.Individuos!)
                 .ThenInclude(i => i.SituacoesDeSaude)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(m => m.Id == id);

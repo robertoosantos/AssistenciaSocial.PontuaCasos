@@ -9,6 +9,8 @@ public class ViolenciaSofrida
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string? Id { get; set; }
+    public int? SituacaoId { get; set; }
+    public int ViolenciaId { get; set; }
     public Item? Situacao { get; set; }
     public Item Violencia { get; set; }
     public IndividuoEmViolacao IndividuoEmViolacao { get; set; }
