@@ -116,7 +116,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return RedirectToAction(nameof(Details), "Casos", new { id = individuo.Caso.Id });
         }
 
-        private List<Item> ConsultarItens() {
+        private List<Item> ConsultarItens()
+        {
             return ConsultarItens(_context);
         }
 
@@ -197,17 +198,18 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Itens/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string? id)
         {
             if (id == null || _context.Itens == null)
             {
                 return NotFound();
             }
 
-            var item = await _context.Itens
-                .Include(i => i.CriadoPor)
-                .Include(i => i.ModificadoPor)
+            var item = await _context.ViolenciasSofridas
+                .Include(vs => vs.IndividuoEmViolacao)
+                .Include(vs => vs.Violencia)
                 .FirstOrDefaultAsync(m => m.Id == id);
+                
             if (item == null)
             {
                 return NotFound();
@@ -219,20 +221,21 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // POST: Itens/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Itens == null)
             {
                 return Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
             }
-            var item = await _context.Itens.FindAsync(id);
+            var item = await _context.ViolenciasSofridas.Include(vs => vs.IndividuoEmViolacao).SingleOrDefaultAsync(vs => vs.Id == id);
+
             if (item != null)
-            {
-                item.Ativo = false;
-            }
+                _context.ViolenciasSofridas.Remove(item);
+            else
+                return RedirectToAction(nameof(HomeController.Index), "Home");
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(CasosController.Details), "Casos", new { id = item.IndividuoEmViolacao.CasoId });
         }
 
         private bool ItemExists(int id)

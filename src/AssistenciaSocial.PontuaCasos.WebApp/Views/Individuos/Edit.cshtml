@@ -28,6 +28,7 @@
                         {
                             <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
                         }
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,6 +43,9 @@
                                     @Html.DropDownList(item.Titulo, new SelectList(item.Itens!.OrderByDescending(i => i.Pontos), "Id", "Titulo", valor != null ? valor.Id : null))
                                 </td>
                             }
+                            <td>
+                                <a asp-action="Delete" asp-controller="Violencias" asp-route-id="@violencia.Id">Remover Violência</a>
+                            </td>
                         </tr>
                     }
                 </tbody>
