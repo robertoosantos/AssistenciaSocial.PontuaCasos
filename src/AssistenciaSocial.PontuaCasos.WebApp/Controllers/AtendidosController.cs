@@ -7,6 +7,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class AtendidosController : Controller
     {
+        internal const string ITENS_ATENDIDOS = "Ciclos de Vida";
+
         private readonly PontuaCasosContext _context;
 
         public AtendidosController(PontuaCasosContext context)
@@ -59,7 +61,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 if (item.Itens != null)
                 {
-                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "" });
+                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
                 }
             }
 
@@ -77,11 +79,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
             IndividuoEmViolacao? individuo = null;
 
-            foreach (string idItem in Request.Form["Itens"])
+            foreach (string idItem in Request.Form[ITENS_ATENDIDOS])
             {
                 var id = int.Parse(idItem);
 
-                if (id > 0)
+                if (id != int.MaxValue)
                 {
                     var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
 
@@ -114,7 +116,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             await _context.SaveChangesAsync();
 
             if (individuo != null)
-                return RedirectToAction(nameof(Details), new { id = individuo.Id });
+                return RedirectToAction(nameof(Details), "Casos", new { id = individuo.CasoId });
             else
                 return View(ConsultarItens());
         }

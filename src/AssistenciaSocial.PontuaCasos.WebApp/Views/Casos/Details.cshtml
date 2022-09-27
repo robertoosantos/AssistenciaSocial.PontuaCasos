@@ -95,38 +95,46 @@
                                 @foreach (var violencia in individuo.ViolenciasSofridas)
                                 {
                                     <li>@Html.DisplayFor(model => violencia.Violencia.Titulo) <span
-                                    class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Categoria.Pontos) x @Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Violencia.Categoria.Pontos) x
+                                            @Html.DisplayFor(model => violencia.Violencia.Pontos))</span></li>
                                 }
                             </ul>
                         </td>
                         <td>
-                            <ul class="list-unstyled">
-                                @foreach (var violencia in individuo.ViolenciasSofridas)
-                                {
+                            @if (individuo.ViolenciasSofridas != null)
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var violencia in individuo.ViolenciasSofridas)
+                                    {
 
-                                    <li>
-                                        @if (violencia.Situacao != null)
-                                        {
-                                            @Html.DisplayFor(model => violencia.Situacao.Titulo) <span
-                                    class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Categoria.Pontos) x @Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="fw-lighter">Desconhecida</span>
-                                        }
-                                    </li>
-                                }
-                            </ul>
+                                        <li>
+                                            @if (violencia.Situacao != null)
+                                            {
+                                                @Html.DisplayFor(model => violencia.Situacao.Titulo) <span
+                                    class="pontos">(@Html.DisplayFor(model => violencia.Situacao.Categoria.Pontos) x
+                                                    @Html.DisplayFor(model => violencia.Situacao.Pontos))</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="fw-lighter">Desconhecida</span>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
                         </td>
                         <td>
-                            <ul class="list-unstyled">
-                                @foreach (var saude in individuo.SituacoesDeSaude)
-                                {
-                                    <li>@Html.DisplayFor(model => saude.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
+                            @if (individuo.SituacoesDeSaude != null)
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var saude in individuo.SituacoesDeSaude)
+                                    {
+                                        <li>@Html.DisplayFor(model => saude.Titulo) <span class="pontos">(@Html.DisplayFor(model =>
                                 saude.Categoria.Pontos) x @Html.DisplayFor(model =>
                                 saude.Pontos))</span></li>
-                                }
-                            </ul>
+                                    }
+                                </ul>
+                            }
                         </td>
                         <td>
                             <ul class="list-unstyled">

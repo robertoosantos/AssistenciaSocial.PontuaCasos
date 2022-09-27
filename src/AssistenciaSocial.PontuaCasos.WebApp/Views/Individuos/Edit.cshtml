@@ -23,7 +23,7 @@
             <input type="hidden" asp-for="Id" />
             <h4>Violências</h4>
             <hr />
-            <table class="table form-group">
+            <table class="table">
                 <thead>
                     <tr>
                         @foreach (var item in Model.OpcoesViolencias!)
@@ -54,13 +54,14 @@
             </table>
             <h4>Condições do Indivíduo em Violação</h4>
             <hr />
-            <table class="table form-group">
+            <table class="table">
                 <thead>
                     <tr>
                         @foreach (var item in Model.OpcoesSaude!)
                         {
                             <th>@Html.DisplayFor(modelItem => item.Titulo)</th>
                         }
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
