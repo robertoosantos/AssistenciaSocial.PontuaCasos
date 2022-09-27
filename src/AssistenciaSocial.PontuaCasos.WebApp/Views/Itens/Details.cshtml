@@ -1,10 +1,10 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.Item
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Item";
 }
 
-<h1>Details</h1>
+<h1>Detalhes</h1>
 
 <div>
     <h4>Item</h4>
@@ -61,6 +61,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a href="javascript:void(0);" onclick="history.go(-1);">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> |
+    <a asp-action="Index" asp-controller="Categorias">Voltar para Categorias</a>
 </div>

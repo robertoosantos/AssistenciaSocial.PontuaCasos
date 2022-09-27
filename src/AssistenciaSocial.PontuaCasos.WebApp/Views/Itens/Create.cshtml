@@ -1,10 +1,10 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.Item
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Novo Item";
 }
 
-<h1>Create</h1>
+<h1>Cadastrar</h1>
 
 <h4>Item</h4>
 <hr />
@@ -23,12 +23,12 @@
                 <span asp-validation-for="Pontos" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Cadastrar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a href="javascript:void(0);" onclick="history.go(-1);">Back to List</a>
+    <a asp-action="Details" asp-controller="Categorias" asp-route-id="@Context.Request.Query["categoria_id"]">Voltar ao Caso</a>
 </div>

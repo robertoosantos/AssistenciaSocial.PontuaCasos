@@ -106,7 +106,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
             catch (DbUpdateException ex)
             {
-                ViewData["Erro"] = "Este indivíduo já possui registro dessa violência.";
+                ViewData["Erro"] = "Esta pessoa já possui registro dessa violência.";
                 return View();
             }
 

@@ -152,57 +152,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return RedirectToAction(nameof(Details), new { id = novoCaso.Entity.Id });
         }
 
-        // GET: Casos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.Casos == null)
-            {
-                return NotFound();
-            }
-
-            var caso = await _context.Casos.FindAsync(id);
-            if (caso == null)
-            {
-                return NotFound();
-            }
-            return View(caso);
-        }
-
-        // POST: Casos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo,CriadoEm,ModificadoEm")] Caso caso)
-        {
-            if (id != caso.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(caso);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CasoExists(caso.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(caso);
-        }
-
         // GET: Casos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

@@ -1,14 +1,13 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.Item
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Remover Condição da Pessoa";
 }
 
-<h1>Delete</h1>
+<h1>Remover</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Tem certeza que quer remover esta condição?</h3>
 <div>
-    <h4>Saúde</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -21,7 +20,7 @@
 
     <form asp-action="Delete" asp-route-individuo_id="@Context.Request.Query["individuo_id"]">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@Context.Request.Query["individuo_id"]">Back to List</a>
+        <input type="submit" value="Remover" class="btn btn-danger" /> |
+        <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@Context.Request.Query["individuo_id"]">Voltar</a>
     </form>
 </div

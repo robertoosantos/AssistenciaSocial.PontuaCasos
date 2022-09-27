@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +12,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public ItensController(PontuaCasosContext context)
         {
             _context = context;
-        }
-
-        // GET: Itens
-        public async Task<IActionResult> Index()
-        {
-            var pontuaCasosContext = _context.Itens.Where(i => !i.ECategoria).Include(i => i.CriadoPor).Include(i => i.ModificadoPor);
-            return View(await pontuaCasosContext.ToListAsync());
         }
 
         // GET: Itens/Details/5

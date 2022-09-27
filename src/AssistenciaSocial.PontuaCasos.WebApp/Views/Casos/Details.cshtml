@@ -1,14 +1,12 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.Caso
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Caso";
 }
 
-<h1>Details</h1>
-
+<h1>Detalhes do Caso</h1>
+<hr />
 <div>
-    <h4>Caso</h4>
-    <hr />
     <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ResponsavelFamiliar)
@@ -70,7 +68,7 @@
     <h4>Sobre a família</h4>
     <hr />
     <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Categorias" />
-    <h4>Indivíduos em Violação</h4>
+    <h4>Pessoas em Violação</h4>
     <hr />
     <table class="table">
         <thead>
@@ -78,7 +76,7 @@
                 <th>Ciclo de Vida</th>
                 <th>Violências</th>
                 <th>Situações</th>
-                <th>Saúde</th>
+                <th>Condições</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -137,26 +135,8 @@
                             }
                         </td>
                         <td>
-                            <ul class="list-unstyled">
-                                <li>
-                                    <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@individuo.Id">Atualizar
-                                        Indivíduo</a>
-                                </li>
-                                <li>
-                                    <a asp-action="Create" asp-controller="Violencias"
-                                asp-route-individuo_id="@individuo.Id">Adicionar
-                                        Violências</a>
-                                </li>
-                                <li>
-                                    <a asp-action="Create" asp-controller="Saude"
-                                asp-route-individuo_id="@individuo.Id">Adicionar
-                                        Saúde</a>
-                                </li>
-                                <li>
-                                    <a asp-action="Delete" asp-controller="Individuos" asp-route-id="@individuo.Id">Remover
-                                        Indivíduo</a>
-                                </li>
-                            </ul>
+                            <a asp-action="Edit" asp-controller="Individuos" asp-route-id="@individuo.Id">Editar</a> |
+                            <a asp-action="Delete" asp-controller="Individuos" asp-route-id="@individuo.Id">Remover</a>
                         </td>
                     </tr>
                 }
@@ -166,6 +146,5 @@
 </div>
 <div>
     <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id">Adicionar Atendidos</a> |
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Voltar</a>
 </div>

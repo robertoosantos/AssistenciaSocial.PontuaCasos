@@ -44,7 +44,7 @@ public class Caso : ModelBaseControle
             foreach (var individuo in Individuos)
             {
                 if (individuo.Item == null || individuo.Item.Categoria == null)
-                    throw new ApplicationException("Necessário carregar as categorias dos indivíduos antes de calcular a pontuação do caso.");
+                    throw new ApplicationException("Necessário carregar as categorias das pessoas antes de calcular a pontuação do caso.");
 
                 pontos += individuo.Item.Categoria.Pontos * individuo.Item.Pontos;
 
@@ -76,7 +76,7 @@ public class Caso : ModelBaseControle
                     foreach (var saude in individuo.SituacoesDeSaude)
                     {
                         if (saude.Categoria == null)
-                            throw new ApplicationException("Necessário carregar as categorias das condições do indivíduo antes de calcular a pontuação do caso.");
+                            throw new ApplicationException("Necessário carregar as categorias das condições da pessoa antes de calcular a pontuação do caso.");
 
                         pontos += saude.Categoria.Pontos * saude.Pontos;
                     }

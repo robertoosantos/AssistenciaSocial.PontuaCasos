@@ -1,23 +1,23 @@
 @model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Incluir Pessoa em Violação";
 }
 
-<h1>Create</h1>
+<h1>Incluir</h1>
 
-<h4>Item</h4>
+<h4>Novo Pessoa em Violação</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" asp-route-caso_id="@Context.Request.Query["caso_id"]">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <partial name="~/Views/Shared/_ItemSelect.cshtml" model="@Model" />
-            <input type="submit" value="Create" class="btn btn-primary" />
+            <input type="submit" value="Incluir" class="btn btn-primary" />
         </form>
     </div>
 </div>
 
 <div>
-    <a href="javascript:void(0);" onclick="history.go(-1);">Back to List</a>
+    <a asp-action="Details" asp-controller="Casos" asp-route-id="@Context.Request.Query["caso_id"]">Voltar ao Caso</a>
 </div>

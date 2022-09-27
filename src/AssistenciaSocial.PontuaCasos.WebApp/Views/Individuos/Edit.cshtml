@@ -1,12 +1,12 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.IndividuoEmViolacao
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Pessoa";
 }
 
-<h1>Edit</h1>
+<h1>Editar</h1>
 
-<h4>Indivíduo</h4>
+<h4>Pessoa</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -22,6 +22,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <h4>Violências</h4>
+                <a asp-action="Create" asp-controller="Violencias" asp-route-individuo_id="@Model.Id">Nova Violência</a>
             <hr />
             <table class="table">
                 <thead>
@@ -52,7 +53,8 @@
                     }
                 </tbody>
             </table>
-            <h4>Condições do Indivíduo em Violação</h4>
+            <h4>Condições da Pessoa em Violação</h4>
+                <a asp-action="Create" asp-controller="Saude" asp-route-individuo_id="@Model.Id">Nova Condição</a>
             <hr />
             <table class="table">
                 <thead>
@@ -82,12 +84,12 @@
                 </tbody>
             </table>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Salvar" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Details" asp-controller="Casos" asp-route-id="@Model.CasoId">Back to List</a>
+    <a asp-action="Details" asp-controller="Casos" asp-route-id="@Model.CasoId">Voltar ao Caso</a>
 </div>
