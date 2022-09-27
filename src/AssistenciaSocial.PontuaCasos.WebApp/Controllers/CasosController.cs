@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
@@ -13,12 +14,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             _context = context;
         }
 
-        // GET: Casos
-        public async Task<IActionResult> Index()
-        {
-            return _context.Casos != null ?
-                        View(await _context.Casos
-                                .Include(c => c.ItensFamiliares!)
+        public IIncludableQueryable<Caso, Item?> GerarIncludes(DbSet<Caso> caso){
+            return caso.Include(c => c.ItensFamiliares!)
                                 .ThenInclude(i => i.Categoria)
                                 .Include(c => c.Individuos!)
                                 .ThenInclude(i => i.Item!)
@@ -33,10 +30,38 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                                 .ThenInclude(s => s.Categoria)
                                 .Include(c => c.Individuos!)
                                 .ThenInclude(i => i.SituacoesDeSaude!)
-                                .ThenInclude(ss => ss.Categoria)
+                                .ThenInclude(ss => ss.Categoria);
+        }
+
+        // GET: Casos
+        public async Task<IActionResult> Index(string? filtro)
+        {
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+
+            switch (filtro)
+            {
+                case "todos":
+                return _context.Casos != null ?
+                        View(await GerarIncludes(_context.Casos)
                                 .AsSplitQuery()
                                 .ToListAsync()) :
                         Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                case "inativos":
+                return _context.Casos != null ?
+                        View(await GerarIncludes(_context.Casos)
+                                .Where(c => c.Ativo == false && c.CriadoPorId == user.Id)
+                                .AsSplitQuery()
+                                .ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                default:
+                return _context.Casos != null ?
+                        View(await GerarIncludes(_context.Casos)
+                                .Where(c => c.Ativo == true && c.CriadoPorId == user.Id)
+                                .AsSplitQuery()
+                                .ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+            }
+            
         }
 
         // GET: Casos/Details/5
@@ -150,6 +175,57 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var novoCaso = _context.Add(caso);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Details), new { id = novoCaso.Entity.Id });
+        }
+
+        // GET: Casos/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null || _context.Casos == null)
+            {
+                return NotFound();
+            }
+
+            var caso = await _context.Casos.FindAsync(id);
+            if (caso == null)
+            {
+                return NotFound();
+            }
+            return View(caso);
+        }
+
+        // POST: Casos/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo,CriadoEm,ModificadoEm")] Caso caso)
+        {
+            if (id != caso.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(caso);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CasoExists(caso.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(caso);
         }
 
         // GET: Casos/Delete/5

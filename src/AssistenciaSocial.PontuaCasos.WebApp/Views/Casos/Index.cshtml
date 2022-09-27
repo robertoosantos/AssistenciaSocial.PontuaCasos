@@ -7,7 +7,12 @@
 <h1>Casos</h1>
 
 <p>
-    <a asp-action="Create">Registar Novo Caso</a>
+    <a asp-action="Create" class="btn btn-primary">Registar Novo Caso</a>
+</p>
+<p class="d-flex justify-content-end">
+<a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
+<a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info ms-2">Meus Casos Ativos</a>
+<a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info ms-2">Meus Casos Inativos</a>
 </p>
 <table class="table">
     <thead>
