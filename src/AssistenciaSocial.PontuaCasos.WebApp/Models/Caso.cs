@@ -15,7 +15,9 @@ public class Caso : ModelBaseControle
 
     [DisplayName("Responsável Familiar")]
     public string ResponsavelFamiliar { get; set; } = null!;
+    [DisplayName("Título")]
     public string Titulo { get; set; } = null!;
+    [DisplayName("Número do Protuário")]
     public string Prontuario { get; set; } = null!;
     public bool Ativo { get; set; }
     public Organizacao? Organizacao { get; set; }
