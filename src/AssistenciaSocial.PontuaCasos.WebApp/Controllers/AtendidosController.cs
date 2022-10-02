@@ -87,7 +87,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             await _context.SaveChangesAsync();
 
             if (individuo != null)
-                return RedirectToAction(nameof(CasosController.Details), "Casos", new { id = individuo.CasoId });
+                return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo.Id });
             else
                 return View(ConsultarItens());
         }

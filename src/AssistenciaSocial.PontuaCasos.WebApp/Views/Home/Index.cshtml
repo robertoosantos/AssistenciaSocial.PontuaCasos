@@ -1,8 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model AssistenciaSocial.PontuaCasos.WebApp.Models.Home?
+
+@{
+    ViewData["Title"] = "Indicadores de Risco";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bem vindo!</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.Identity.IsAuthenticated)
+{
+    <h4>Casos Sem Atualização</h4>
+    <p>Há mais de 6 meses</p>
+    <hr />
+    @if (Model != null && Model.CasosSemAtualizacao != null && Model.CasosSemAtualizacao.Count > 0)
+    {
+        <partial name="~/Views/Shared/_CasosResumo.cshtml" model="@Model.CasosSemAtualizacao" />
+    }
+    else
+    {
+        <p class="alert alert-primary" role="alert">Parabéns! Você não possui nenhum caso pendente de atualização.</p>
+    }
+    
+    @if (Model != null && Model.CasosEmAtualizacao != null && Model.CasosEmAtualizacao.Count > 0)
+    {
+        <h4>Casos Em Atualização</h4>
+        <hr />
+        <partial name="~/Views/Shared/_CasosResumo.cshtml" model="@Model.CasosEmAtualizacao" />
+    }
+}
+else 
+{
+    <div class="text-center">
+        <h1>Olá!</h1>
+        <p>Esse é o aplicativo Indicadores de Risco para organização de atendimentos da assistência social.</p>
+        <p>Realize seu acesso através das opções <span class="fw-bold">"Cadastrar"</span> ou <span class="fw-bold">"Acessar"</span> acima.</p>
+    </div>
+}

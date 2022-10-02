@@ -73,6 +73,19 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .UsingEntity(mo => mo.ToTable("MembrosOrganizacao"));
 
         modelBuilder.Entity<Caso>()
+            .ToTable(
+                "Casos",
+                c => c.IsTemporal(
+                    c => 
+                    {
+                        c.HasPeriodStart("De");
+                        c.HasPeriodEnd("Ate");
+                        c.UseHistoryTable("CasosHistorico");
+                    }
+                )
+            );
+
+        modelBuilder.Entity<Caso>()
             .HasOne(c => c.ModificadoPor)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);

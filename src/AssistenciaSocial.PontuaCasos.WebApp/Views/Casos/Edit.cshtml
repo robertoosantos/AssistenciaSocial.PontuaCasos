@@ -37,8 +37,17 @@
         </form>
     </div>
 </div>
-
+<div>
+    <br />
+    <h4>Sobre a família</h4>
+    <hr />
+    <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Categorias" />
+    <h4>Pessoas em Violação</h4>
+    <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar
+        Pessoa</a>
+    <hr />
+    <partial name="~/Views/Shared/_IndividuosList.cshtml" model="@Model.Individuos" />
+</div>
 <div>
     <a asp-action="Index">Voltar</a>
 </div>
-

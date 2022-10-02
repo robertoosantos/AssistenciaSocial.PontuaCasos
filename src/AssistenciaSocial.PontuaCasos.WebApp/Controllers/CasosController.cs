@@ -68,11 +68,22 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            //TODO: Tá tudo errado
             if (id == null || _context.Casos == null)
             {
                 return NotFound();
             }
+
+            var caso = await ConsultarItem(id);
+
+            if (caso == null) {
+                return NotFound();
+            }
+
+            return View(caso);
+        }
+
+        private async Task<Caso?> ConsultarItem(int? id)
+        {
 
             var caso = await _context.Casos
                 .Include(c => c.ItensFamiliares!)
@@ -96,37 +107,40 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             if (caso == null)
             {
-                return NotFound();
+                return null;
             }
 
             var categorias = new Dictionary<int, Item>();
 
-            foreach (var item in caso.ItensFamiliares)
+            if (caso.ItensFamiliares != null)
             {
-                if (item.CategoriaId != null)
+                foreach (var item in caso.ItensFamiliares)
                 {
-                    Item? existe;
-
-                    var categoria = _context.Itens.First(i => i.Id == item.CategoriaId);
-
-                    if (categorias.TryGetValue((int)item.CategoriaId, out existe))
+                    if (item.CategoriaId != null)
                     {
-                        if (existe.Itens != null)
-                            existe.Itens.Add(item);
-                    }
-                    else
-                    {
+                        Item? existe;
 
-                        categoria.Itens = new List<Item>();
-                        categoria.Itens.Add(item);
-                        categorias.Add((int)item.CategoriaId, categoria);
+                        var categoria = _context.Itens.First(i => i.Id == item.CategoriaId);
+
+                        if (categorias.TryGetValue((int)item.CategoriaId, out existe))
+                        {
+                            if (existe.Itens != null)
+                                existe.Itens.Add(item);
+                        }
+                        else
+                        {
+
+                            categoria.Itens = new List<Item>();
+                            categoria.Itens.Add(item);
+                            categorias.Add((int)item.CategoriaId, categoria);
+                        }
                     }
                 }
             }
 
             caso.Categorias = categorias.Values.ToList();
 
-            return View(caso);
+            return caso;
         }
 
         // GET: Casos/Create
@@ -163,6 +177,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             caso.CriadoPorId = user.Id;
             caso.ModificadoPorId = user.Id;
             caso.Ativo = true;
+            caso.EmAtualizacao = true;
 
             if (user.Organizacoes != null)
                 caso.Organizacao = user.Organizacoes.First();
@@ -175,11 +190,37 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var novoCaso = _context.Add(caso);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details), new { id = novoCaso.Entity.Id });
+            return RedirectToAction(nameof(Edit), new { id = novoCaso.Entity.Id });
         }
 
         // GET: Casos/Edit/5
         public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null || _context.Casos == null)
+            {
+                return NotFound();
+            }
+
+            var caso = await ConsultarItem(id);
+            if (caso == null)
+            {
+                return NotFound();
+            }
+
+            if (!caso.EmAtualizacao)
+            {
+                caso.EmAtualizacao = true;
+                _context.Update(caso);
+                await _context.SaveChangesAsync();
+            }
+
+            ViewData["Editando"] = true;
+
+            return View(caso);
+        }
+
+        // GET: Casos/Edit/5
+        public async Task<IActionResult> EditConfirmed(int? id)
         {
             if (id == null || _context.Casos == null)
             {
@@ -191,7 +232,17 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 return NotFound();
             }
-            return View(caso);
+
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+
+            caso.EmAtualizacao = false;
+            caso.ModificadoEm = DateTime.Now;
+            caso.ModificadoPorId = user.Id;
+
+            _context.Update(caso);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: Casos/Edit/5

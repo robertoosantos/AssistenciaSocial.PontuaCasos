@@ -23,6 +23,7 @@ public class Caso : ModelBaseControle
     public Organizacao? Organizacao { get; set; }
     public List<Item>? ItensFamiliares { get; set; }
     public List<IndividuoEmViolacao>? Individuos { get; set; }
+    public bool EmAtualizacao { get; set; }
     [NotMapped]
     public List<Item>? Categorias { get; set; }
 

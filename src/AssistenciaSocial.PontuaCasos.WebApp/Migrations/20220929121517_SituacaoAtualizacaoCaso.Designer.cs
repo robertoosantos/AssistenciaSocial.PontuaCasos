@@ -4,6 +4,7 @@ using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     [DbContext(typeof(PontuaCasosContext))]
-    partial class PontuaCasosContextModelSnapshot : ModelSnapshot
+    [Migration("20220929121517_SituacaoAtualizacaoCaso")]
+    partial class SituacaoAtualizacaoCaso
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +75,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("OrganizacaoId");
 
-                    b.ToTable("Casos", (string)null);
+                    b.ToTable("Casos");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.IndividuoEmViolacao", b =>
@@ -94,7 +96,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemId");
 
-                    b.ToTable("IndividuosEmViolacoes", (string)null);
+                    b.ToTable("IndividuosEmViolacoes");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Item", b =>
@@ -159,7 +161,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("RelacionadoAoId");
 
-                    b.ToTable("Itens", (string)null);
+                    b.ToTable("Itens");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Organizacao", b =>
@@ -194,7 +196,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ModificadoPorId");
 
-                    b.ToTable("Organizacoes", (string)null);
+                    b.ToTable("Organizacoes");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Usuario", b =>
@@ -292,7 +294,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     b.HasIndex("IndividuoEmViolacaoId", "ViolenciaId")
                         .IsUnique();
 
-                    b.ToTable("ViolenciasSofridas", (string)null);
+                    b.ToTable("ViolenciasSofridas");
                 });
 
             modelBuilder.Entity("ItensFamiliares", b =>
@@ -307,7 +309,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemFamiliarId");
 
-                    b.ToTable("ItensFamiliares", (string)null);
+                    b.ToTable("ItensFamiliares");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -474,7 +476,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 
                     b.HasIndex("ItemSaudeId");
 
-                    b.ToTable("SaudeIndividuos", (string)null);
+                    b.ToTable("SaudeIndividuos");
                 });
 
             modelBuilder.Entity("AssistenciaSocial.PontuaCasos.WebApp.Models.Caso", b =>

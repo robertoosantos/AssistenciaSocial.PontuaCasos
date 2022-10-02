@@ -147,7 +147,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(CasosController.Details), "Casos", new { id = item.IndividuoEmViolacao.CasoId });
+            return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = item.IndividuoEmViolacao.Id });
         }
 
         private bool ItemExists(int id)

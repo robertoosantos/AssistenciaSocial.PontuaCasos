@@ -1,0 +1,68 @@
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Caso>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ResponsavelFamiliar)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Titulo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Prontuario)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pontos)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ResponsavelFamiliar)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titulo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Prontuario)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pontos)
+                </td>
+                <td>
+                    <ul class="list-unstyled">
+                        <li>
+                            @if (item.EmAtualizacao)
+                            {
+                                <a asp-action="Edit" asp-controller="Casos" asp-route-id="@item.Id" class="btn btn-primary">Continuar Atualização</a>
+                            }
+                            else
+                            {
+                                <a asp-action="Edit" asp-controller="Casos" asp-route-id="@item.Id" class="btn btn-primary">Iniciar Atualização</a>
+                            }
+                        </li>
+                        @if (item.EmAtualizacao)
+                        {
+                            <li>
+                                <a asp-action="EditConfirmed" asp-controller="Casos" asp-route-id="@item.Id" class="btn btn-danger"
+                                    onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
+                                    Atualização</a>
+                            </li>
+                        }
+                        <li>
+                            <a asp-action="Details" asp-controller="Casos" asp-route-id="@item.Id">Detalhes</a>
+                        </li>
+                        <li>
+                            <a asp-action="Delete" asp-controller="Casos" asp-route-id="@item.Id">Excluir</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
