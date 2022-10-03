@@ -21,6 +21,66 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Caso>()
+            .ToTable(
+                "Casos",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("CasosHistorico");
+                    }
+                ));
+
+        modelBuilder.Entity<IndividuoEmViolacao>()
+            .ToTable(
+                "IndividuosEmViolacoes",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("IndividuosEmViolacoesHistorico");
+                    }
+                ));
+
+        modelBuilder.Entity<ViolenciaSofrida>()
+            .ToTable(
+                "ViolenciasSofridas",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("ViolenciasSofridasHistorico");
+                    }
+                ));
+
+        modelBuilder.Entity<ItemFamiliar>()
+            .ToTable(
+                "ItensFamiliares",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("ItensFamiliaresHistorico");
+                    }
+                ));
+
+        modelBuilder.Entity<SaudeIndividuo>()
+            .ToTable(
+                "SaudeIndividuos",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("SaudeIndividuosHistorico");
+                    }
+                ));
+
         modelBuilder.Entity<Item>()
             .HasOne(i => i.ModificadoPor)
             .WithMany()
@@ -73,19 +133,6 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
             .UsingEntity(mo => mo.ToTable("MembrosOrganizacao"));
 
         modelBuilder.Entity<Caso>()
-            .ToTable(
-                "Casos",
-                c => c.IsTemporal(
-                    c => 
-                    {
-                        c.HasPeriodStart("De");
-                        c.HasPeriodEnd("Ate");
-                        c.UseHistoryTable("CasosHistorico");
-                    }
-                )
-            );
-
-        modelBuilder.Entity<Caso>()
             .HasOne(c => c.ModificadoPor)
             .WithMany()
             .OnDelete(DeleteBehavior.NoAction);
@@ -98,20 +145,22 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<Caso>()
             .HasMany(c => c.ItensFamiliares)
             .WithMany(i => i.Casos)
-            .UsingEntity<Dictionary<string, object>>(
-                "ItensFamiliares",
+            .UsingEntity<ItemFamiliar>(
                 j => j
                     .HasOne<Item>()
                     .WithMany()
-                    .HasForeignKey("ItemFamiliarId")
+                    .HasForeignKey(i => i.ItemFamiliarId)
                     .HasConstraintName("FK_ItensFamiliares_Itens_ItemFamiliarId")
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne<Caso>()
                     .WithMany()
-                    .HasForeignKey("CasoId")
+                    .HasForeignKey(i => i.CasoId)
                     .HasConstraintName("FK_ItensFamiliares_Casos_CasoId")
-                    .OnDelete(DeleteBehavior.ClientCascade));
+                    .OnDelete(DeleteBehavior.ClientCascade),
+                j => {
+                    j.HasKey(it => new { it.CasoId, it.ItemFamiliarId});
+                });
 
         modelBuilder.Entity<IndividuoEmViolacao>()
             .HasOne(i => i.Item)
@@ -121,18 +170,17 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
         modelBuilder.Entity<IndividuoEmViolacao>()
             .HasMany(i => i.SituacoesDeSaude)
             .WithMany(s => s.IndividuosSaude)
-            .UsingEntity<Dictionary<string, object>>(
-                "SaudeIndividuos",
+            .UsingEntity<SaudeIndividuo>(
                 j => j
                     .HasOne<Item>()
                     .WithMany()
-                    .HasForeignKey("ItemSaudeId")
+                    .HasForeignKey(i => i.ItemSaudeId)
                     .HasConstraintName("FK_SaudeIndividuos_Itens_ItemSaudeId")
                     .OnDelete(DeleteBehavior.Cascade),
                 j => j
                     .HasOne<IndividuoEmViolacao>()
                     .WithMany()
-                    .HasForeignKey("IndividuoId")
+                    .HasForeignKey(i => i.IndividuoId)
                     .HasConstraintName("FK_SaudeIndividuos_Individuos_IndividuoId")
                     .OnDelete(DeleteBehavior.Cascade));
 
