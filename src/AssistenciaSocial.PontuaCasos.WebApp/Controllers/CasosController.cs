@@ -65,6 +65,17 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         }
 
+        // GET: Casos/History
+        public async Task<IActionResult> History(int? id)
+        {
+            return _context.Casos != null ?
+                    View(await _context.Casos
+                            .TemporalAll()
+                            .Where(c => c.Id == id)
+                            .ToListAsync()) :
+                    Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+        }
+
         // GET: Casos/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -75,7 +86,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var caso = await ConsultarItem(id);
 
-            if (caso == null) {
+            if (caso == null)
+            {
                 return NotFound();
             }
 
@@ -86,29 +98,58 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
 
             var caso = await _context.Casos
-                .Include(c => c.ItensFamiliares!)
-                .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.Item!)
-                .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.ViolenciasSofridas!)
-                .ThenInclude(v => v.Violencia!)
-                .ThenInclude(v => v.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.ViolenciasSofridas!)
-                .ThenInclude(v => v.Situacao!)
-                .ThenInclude(s => s.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.SituacoesDeSaude!)
-                .ThenInclude(ss => ss.Categoria)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(m => m.Id == id);
+                        .TemporalAsOf(DateTime.Now)
+                        .FirstOrDefaultAsync(m => m.Id == id);
 
             if (caso == null)
             {
                 return null;
             }
+
+            var individuos = await _context.IndividuosEmViolacoes
+                                .TemporalAsOf(DateTime.Now)
+                                .Where(iv => iv.CasoId == caso.Id).ToListAsync();
+
+            caso.ItensFamiliares = await _context.ItensFamiliares
+                                    .TemporalAsOf(DateTime.Now)
+                                    .Join(_context.Itens,
+                                    i => i.ItemFamiliarId,
+                                    it => it.Id,
+                                    (i, it) => new { i, it })
+                                    .Where(ifa => ifa.i.CasoId == caso.Id)
+                                    .Select(ifa => ifa.it)
+                                    .Include(i => i.Categoria)
+                                    .ToListAsync();
+
+            foreach (var i in individuos)
+            {
+                i.Item = await _context.Itens.Include(i => i.Categoria).FirstAsync(it => it.Id == i.ItemId);
+
+                i.ViolenciasSofridas = await _context.ViolenciasSofridas
+                                        .TemporalAsOf(DateTime.Now)
+                                        .Where(vs => vs.IndividuoEmViolacao.Id == i.Id)
+                                        .ToListAsync();
+
+                i.SituacoesDeSaude = await _context.SitaucoesIndivididuo
+                                        .TemporalAsOf(DateTime.Now)
+                                        .Join(_context.Itens,
+                                        s => s.ItemSaudeId,
+                                        i => i.Id,
+                                        (s, i) => new { i, s })
+                                        .Where(si => si.s.IndividuoId == i.Id)
+                                        .Select(x => x.i)
+                                        .Include(x => x.Categoria)
+                                        .ToListAsync();
+
+                foreach (var v in i.ViolenciasSofridas)
+                {
+                    v.Violencia = await _context.Itens
+                                    .Include(i => i.Categoria)
+                                    .FirstOrDefaultAsync(i => i.Id == v.ViolenciaId);
+                }
+            }
+
+            caso.Individuos = individuos;
 
             var categorias = new Dictionary<int, Item>();
 
