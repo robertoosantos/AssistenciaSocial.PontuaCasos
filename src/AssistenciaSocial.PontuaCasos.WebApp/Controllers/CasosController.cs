@@ -77,14 +77,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Casos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, DateTime? modificado_em)
         {
             if (id == null || _context.Casos == null)
             {
                 return NotFound();
             }
 
-            var caso = await ConsultarItem(id);
+            var caso = await ConsultarItem(id, modificado_em);
 
             if (caso == null)
             {
@@ -94,12 +94,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return View(caso);
         }
 
-        private async Task<Caso?> ConsultarItem(int? id)
+        private async Task<Caso?> ConsultarItem(int? id, DateTime? modificadoEm)
         {
+            if (modificadoEm == null)
+                return await ConsultarItem(id);
 
             var caso = await _context.Casos
-                        .TemporalAsOf(DateTime.Now)
-                        .FirstOrDefaultAsync(m => m.Id == id);
+            .TemporalAll()
+            .FirstOrDefaultAsync(m => m.Id == id && m.ModificadoEm >= modificadoEm.Value);
 
             if (caso == null)
             {
@@ -107,11 +109,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var individuos = await _context.IndividuosEmViolacoes
-                                .TemporalAsOf(DateTime.Now)
+                                .TemporalAsOf(modificadoEm.Value)
                                 .Where(iv => iv.CasoId == caso.Id).ToListAsync();
 
             caso.ItensFamiliares = await _context.ItensFamiliares
-                                    .TemporalAsOf(DateTime.Now)
+                                    .TemporalAsOf(modificadoEm.Value)
                                     .Join(_context.Itens,
                                     i => i.ItemFamiliarId,
                                     it => it.Id,
@@ -126,12 +128,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 i.Item = await _context.Itens.Include(i => i.Categoria).FirstAsync(it => it.Id == i.ItemId);
 
                 i.ViolenciasSofridas = await _context.ViolenciasSofridas
-                                        .TemporalAsOf(DateTime.Now)
+                                        .TemporalAsOf(modificadoEm.Value)
                                         .Where(vs => vs.IndividuoEmViolacao.Id == i.Id)
                                         .ToListAsync();
 
                 i.SituacoesDeSaude = await _context.SitaucoesIndivididuo
-                                        .TemporalAsOf(DateTime.Now)
+                                        .TemporalAsOf(modificadoEm.Value)
                                         .Join(_context.Itens,
                                         s => s.ItemSaudeId,
                                         i => i.Id,
@@ -146,11 +148,22 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     v.Violencia = await _context.Itens
                                     .Include(i => i.Categoria)
                                     .FirstOrDefaultAsync(i => i.Id == v.ViolenciaId);
+
+                    if (v.SituacaoId != null && v.SituacaoId > 0)
+                        v.Situacao = await _context.Itens
+                                        .Include(i => i.Categoria)
+                                        .FirstOrDefaultAsync(i => i.Id == v.SituacaoId);
                 }
             }
 
             caso.Individuos = individuos;
+            AgruparCategorias(caso);
 
+            return caso;
+        }
+
+        private void AgruparCategorias(Caso? caso)
+        {
             var categorias = new Dictionary<int, Item>();
 
             if (caso.ItensFamiliares != null)
@@ -180,6 +193,38 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             caso.Categorias = categorias.Values.ToList();
+        }
+
+        private async Task<Caso?> ConsultarItem(int? id)
+        {
+            var caso = await _context.Casos
+                .Include(c => c.ItensFamiliares!)
+                .ThenInclude(i => i.Categoria)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.Item!)
+                .ThenInclude(i => i.Categoria)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.ViolenciasSofridas!)
+                .ThenInclude(v => v.Violencia!)
+                .ThenInclude(v => v.Categoria)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.ViolenciasSofridas!)
+                .ThenInclude(v => v.Situacao!)
+                .ThenInclude(s => s.Categoria)
+                .Include(c => c.Individuos!)
+                .ThenInclude(i => i.SituacoesDeSaude!)
+                .ThenInclude(ss => ss.Categoria)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+
+            if (caso == null)
+            {
+                return null;
+            }
+
+
+            AgruparCategorias(caso);
 
             return caso;
         }
