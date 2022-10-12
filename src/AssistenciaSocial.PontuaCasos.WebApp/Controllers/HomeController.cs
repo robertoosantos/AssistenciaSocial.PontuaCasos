@@ -24,9 +24,9 @@ public class HomeController : Controller
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
 
-            home.CasosEmAtualizacao = _context.Casos.Where(c => c.EmAtualizacao == true && (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id)).ToList();
+            home.CasosEmAtualizacao = CasosController.GerarIncludes(_context.Casos).Where(c => c.EmAtualizacao == true && (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id)).ToList();
 
-            home.CasosSemAtualizacao = _context.Casos.Where(c => (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id) && EF.Functions.DateDiffMonth(c.ModificadoEm, DateTime.Now) >= 6).ToList();
+            home.CasosSemAtualizacao = CasosController.GerarIncludes(_context.Casos).Where(c => (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id) && EF.Functions.DateDiffMonth(c.ModificadoEm, DateTime.Now) >= 6).ToList();
         }
 
         return View(home);

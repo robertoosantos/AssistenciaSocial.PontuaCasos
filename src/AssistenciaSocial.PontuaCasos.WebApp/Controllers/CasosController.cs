@@ -14,7 +14,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             _context = context;
         }
 
-        public IIncludableQueryable<Caso, Item?> GerarIncludes(DbSet<Caso> caso)
+        public static IQueryable<Caso> GerarIncludes(DbSet<Caso> caso)
         {
             return caso.Include(c => c.ItensFamiliares!)
                                 .ThenInclude(i => i.Categoria)
@@ -31,7 +31,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                                 .ThenInclude(s => s.Categoria)
                                 .Include(c => c.Individuos!)
                                 .ThenInclude(i => i.SituacoesDeSaude!)
-                                .ThenInclude(ss => ss.Categoria);
+                                .ThenInclude(ss => ss.Categoria)
+                                .AsSplitQuery();
         }
 
         // GET: Casos
@@ -44,21 +45,18 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 case "todos":
                     return _context.Casos != null ?
                             View(await GerarIncludes(_context.Casos)
-                                    .AsSplitQuery()
                                     .ToListAsync()) :
                             Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
                 case "inativos":
                     return _context.Casos != null ?
                             View(await GerarIncludes(_context.Casos)
                                     .Where(c => c.Ativo == false && c.CriadoPorId == user.Id)
-                                    .AsSplitQuery()
                                     .ToListAsync()) :
                             Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
                 default:
                     return _context.Casos != null ?
                             View(await GerarIncludes(_context.Casos)
                                     .Where(c => c.Ativo == true && c.CriadoPorId == user.Id)
-                                    .AsSplitQuery()
                                     .ToListAsync()) :
                             Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
             }
@@ -72,6 +70,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     View(await _context.Casos
                             .TemporalAll()
                             .Where(c => c.Id == id)
+                            .OrderByDescending(c => EF.Property<DateTime>(c, "ValidoAte"))
                             .ToListAsync()) :
                     Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
         }
@@ -197,24 +196,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         private async Task<Caso?> ConsultarItem(int? id)
         {
-            var caso = await _context.Casos
-                .Include(c => c.ItensFamiliares!)
-                .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.Item!)
-                .ThenInclude(i => i.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.ViolenciasSofridas!)
-                .ThenInclude(v => v.Violencia!)
-                .ThenInclude(v => v.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.ViolenciasSofridas!)
-                .ThenInclude(v => v.Situacao!)
-                .ThenInclude(s => s.Categoria)
-                .Include(c => c.Individuos!)
-                .ThenInclude(i => i.SituacoesDeSaude!)
-                .ThenInclude(ss => ss.Categoria)
-                .AsSplitQuery()
+            var caso = await GerarIncludes(_context.Casos)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
 
