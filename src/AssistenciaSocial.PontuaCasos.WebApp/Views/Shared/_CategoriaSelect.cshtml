@@ -1,24 +1,31 @@
-@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Item>
+@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.ViewModelCategoriaFamiliar>
 
 <h4>Sobre a família</h4>
+<hr />
 <table class="table">
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var categoria in Model)
         {
-            <tr>
-                <td class="fw-bold fs-5">
-                    @Html.DisplayFor(modelItem => item.Titulo)
-                </td>
-                @foreach (var subitem in item.Itens)
-                {
-                    <td>
-                        <label for="@subitem.Titulo" class="fw-light">@subitem.Titulo</label>
+            if (categoria.Itens != null)
+            {
+                <tr>
+                    <td class="fw-bold fs-5">
+                        @Html.DisplayFor(modelItem => categoria.Categoria.Titulo)
                     </td>
-                    <td>
-                        <input class="me-5" id="@subitem.Id" type="checkbox" name="@subitem.Titulo" value="itens_@subitem.Id"/>
-                    </td>
-                }
-            </tr>
+                    @foreach (var itemCategoria in categoria.Itens.OrderBy(i => i.Item.Pontos))
+                    {
+                        var item = itemCategoria.Item;
+
+                        <td>
+                            <label for="@item.Titulo" class="fw-light">@item.Titulo</label>
+                        </td>
+                        <td>
+                            <input class="me-5" id="@item.Id" type="checkbox" name="@item.Titulo" value="itens_@item.Id"
+                    checked="@itemCategoria.Selecionado" />
+                        </td>
+                    }
+                </tr>
+            }
         }
     </tbody>
 </table>

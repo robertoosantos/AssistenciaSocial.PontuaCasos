@@ -5,11 +5,11 @@ using AssistenciaSocial.PontuaCasos.WebApp.Models;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
-    public class IndividuosController : Controller
+    public class ItensFamiliares : Controller
     {
         private readonly PontuaCasosContext _context;
 
-        public IndividuosController(PontuaCasosContext context)
+        public ItensFamiliares(PontuaCasosContext context)
         {
             _context = context;
         }

@@ -9,9 +9,9 @@
 <h4>Caso</h4>
 <a asp-action="History" asp-route-id="@Model.Id">Ver Histórico</a>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
+<form asp-action="Edit">
+    <div class="row">
+        <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="Ativo" />
@@ -32,19 +32,25 @@
                 <input asp-for="Prontuario" class="form-control" />
                 <span asp-validation-for="Prontuario" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Salvar" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+    <div>
+        <br />
+        @if (ViewBag.Categorias != null)
+        {
+            <partial name="~/Views/Shared/_CategoriaSelect.cshtml" model="@ViewBag.Categorias" />
+        }
+        <div class="form-group">
+            <input type="submit" value="Salvar" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+<br />
+<br />
 <div>
-    <br />
-    <h4>Sobre a família</h4>
-    <hr />
-    <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Categorias" />
     <h4>Pessoas em Violação</h4>
-    <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar
+    <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id"
+        class="btn btn-outline-primary">Adicionar
         Pessoa</a>
     <hr />
     <partial name="~/Views/Shared/_IndividuosList.cshtml" model="@Model.Individuos" />
@@ -52,3 +58,9 @@
 <div>
     <a asp-action="Index">Voltar</a>
 </div>
+@if (ViewData["CasoAtualizado"] != null)
+{
+    <script>
+        alert("Atualização realizada com sucesso!");
+    </script>
+}

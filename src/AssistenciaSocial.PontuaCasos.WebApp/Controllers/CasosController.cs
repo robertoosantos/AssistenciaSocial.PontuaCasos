@@ -161,7 +161,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return caso;
         }
 
-        private void AgruparCategorias(Caso? caso)
+        private void AgruparCategorias(Caso caso)
         {
             var categorias = new Dictionary<int, Item>();
 
@@ -214,8 +214,43 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Create
         public IActionResult Create()
         {
-            ViewBag.Categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
+            ViewBag.Categorias = ConsultarCategorias(null);
             return View();
+        }
+
+        private List<ViewModelCategoriaFamiliar> ConsultarCategorias(Caso? caso)
+        {
+            var retorno = new List<ViewModelCategoriaFamiliar>();
+
+            var categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
+
+            foreach (var categoria in categorias)
+            {
+                var vmCategoria = new ViewModelCategoriaFamiliar();
+                vmCategoria.Categoria = categoria;
+                vmCategoria.Itens = new List<ViewModelItemFamiliar>();
+
+                if (categoria.Itens == null)
+                    break;
+
+                foreach (var item in categoria.Itens)
+                {
+                    var selecionado = false;
+
+                    if (caso != null && caso.ItensFamiliares != null)
+                        selecionado = caso.ItensFamiliares.Exists(i => i.Id == item.Id);
+
+                    vmCategoria.Itens.Add(new ViewModelItemFamiliar
+                    {
+                        Item = item,
+                        Selecionado = selecionado
+                    });
+                }
+
+                retorno.Add(vmCategoria);
+            }
+
+            return retorno;
         }
 
         // POST: Casos/Create
@@ -227,18 +262,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
-            foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
-            {
-                var id = int.Parse(item.Value[0].Replace("itens_", ""));
-                var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
-                if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
-                {
-                    if (caso.ItensFamiliares == null)
-                        caso.ItensFamiliares = new List<Item>();
-
-                    caso.ItensFamiliares.Add(itemSelecionado);
-                }
-            }
+            PreencherItensFamiliares(caso);
 
             caso.CriadoEm = DateTime.Now;
             caso.ModificadoEm = caso.CriadoEm;
@@ -261,6 +285,22 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return RedirectToAction(nameof(Edit), new { id = novoCaso.Entity.Id });
         }
 
+        private void PreencherItensFamiliares(Caso caso)
+        {
+            foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
+            {
+                var id = int.Parse(item.Value[0].Replace("itens_", ""));
+                var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
+                if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
+                {
+                    if (caso.ItensFamiliares == null)
+                        caso.ItensFamiliares = new List<Item>();
+
+                    caso.ItensFamiliares.Add(itemSelecionado);
+                }
+            }
+        }
+
         // GET: Casos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -281,6 +321,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 _context.Update(caso);
                 await _context.SaveChangesAsync();
             }
+
+            ViewBag.Categorias = ConsultarCategorias(caso);
 
             ViewData["Editando"] = true;
 
@@ -326,23 +368,35 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
-            caso.ModificadoEm = DateTime.Now;
-            caso.ModificadoPorId = user.Id;
+            var casoDb = await _context.Casos.Include(c => c.ItensFamiliares).FirstAsync(c => c.Id == id);
+
+            if (casoDb == null)
+                return View(caso);
+
+            if (casoDb.ItensFamiliares != null)
+                casoDb.ItensFamiliares.Clear();
+            else
+                casoDb.ItensFamiliares = new List<Item>();
+
+            PreencherItensFamiliares(casoDb);
+
+            casoDb.ModificadoEm = DateTime.Now;
+            casoDb.ModificadoPorId = user.Id;
 
             ModelState.Clear();
-            if (!TryValidateModel(caso, nameof(caso)))
+            if (!TryValidateModel(casoDb, nameof(caso)))
             {
                 return View(caso);
             }
 
             try
             {
-                _context.Update(caso);
+                _context.Update(casoDb);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CasoExists(caso.Id))
+                if (!CasoExists(casoDb.Id))
                 {
                     return NotFound();
                 }
@@ -351,6 +405,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     throw;
                 }
             }
+
             return RedirectToAction(nameof(Index));
         }
 
