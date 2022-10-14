@@ -67,7 +67,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             organizacao.CriadoPorId = user.Id;
             organizacao.ModificadoPorId = user.Id;
 
-            ModelState.Clear();
+            ModelState.ClearValidationState(nameof(organizacao));
             if (!TryValidateModel(organizacao, nameof(organizacao)))
             {
                 return View(organizacao);

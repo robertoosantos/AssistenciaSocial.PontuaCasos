@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Localization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 builder.Services.AddDbContext<PontuaCasosContext>(options =>
     options.UseSqlServer($"Server={builder.Configuration["DatabaseServer"]};Database={builder.Configuration["DatabaseName"]};User Id={builder.Configuration["DatabaseUser"]};Password={builder.Configuration["DatabasePassword"]};"));

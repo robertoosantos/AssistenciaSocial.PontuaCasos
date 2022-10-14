@@ -258,7 +258,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar")] Caso caso)
+        public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,CriadoPorId,ModificadoPorId")] Caso caso)
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
 
@@ -274,9 +274,10 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             if (user.Organizacoes != null)
                 caso.Organizacao = user.Organizacoes.First();
 
-            ModelState.Clear();
+            ModelState.ClearValidationState(nameof(caso));
             if (!TryValidateModel(caso, nameof(caso)))
             {
+                ViewBag.Categorias = ConsultarCategorias(null);
                 return View(caso);
             }
 

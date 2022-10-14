@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -14,11 +15,13 @@ public class Caso : ModelBaseControle
     }
 
     [DisplayName("Responsável Familiar")]
+    [Required(ErrorMessage="Responsável familiar é obrigatório")]
     public string ResponsavelFamiliar { get; set; } = null!;
     [DisplayName("Título")]
+    [Required(ErrorMessage="Título é obrigatório")]
     public string Titulo { get; set; } = null!;
-    [DisplayName("Número do Protuário")]
-    public string Prontuario { get; set; } = null!;
+    [DisplayName("Número do Prontuário")]
+    public string? Prontuario { get; set; } = null!;
     public bool Ativo { get; set; }
     public Organizacao? Organizacao { get; set; }
     public List<Item>? ItensFamiliares { get; set; }
