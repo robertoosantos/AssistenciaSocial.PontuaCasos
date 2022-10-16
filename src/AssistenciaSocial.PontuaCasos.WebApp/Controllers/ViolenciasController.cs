@@ -7,8 +7,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class ViolenciasController : Controller
     {
-        internal const string ITENS_VIOLENCIAS = "Violências";
-        internal const string ITENS_SITUACAO_VIOLENCIAS = "Situações das Violências";
         private readonly PontuaCasosContext _context;
 
         public ViolenciasController(PontuaCasosContext context)
@@ -41,8 +39,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(u => u.Organizacoes)
                 .First(u => User.Identity != null && u.Email == User.Identity.Name);
 
-            var idViolencia = int.Parse(Request.Form[ITENS_VIOLENCIAS][0]);
-            var idSituacao = int.Parse(Request.Form[ITENS_SITUACAO_VIOLENCIAS][0]);
+            var idViolencia = int.Parse(Request.Form[Item.ITENS_VIOLENCIAS][0]);
+            var idSituacao = int.Parse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][0]);
 
             if (idViolencia == 0)
             {
@@ -94,7 +92,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         public static List<Item> ConsultarItens(PontuaCasosContext context)
         {
-            var filtro = new List<string> { ITENS_VIOLENCIAS, ITENS_SITUACAO_VIOLENCIAS };
+            var filtro = new List<string> { Item.ITENS_VIOLENCIAS, Item.ITENS_SITUACAO_VIOLENCIAS };
 
             var itens = context.Itens.Include(i => i.Itens).Where(i => filtro.Contains(i.Titulo)).OrderByDescending(i => i.Pontos).ToList();
 

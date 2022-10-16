@@ -7,8 +7,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class AtendidosController : Controller
     {
-        internal const string ITENS_ATENDIDOS = "Ciclos de Vida";
-
         private readonly PontuaCasosContext _context;
 
         public AtendidosController(PontuaCasosContext context)
@@ -50,7 +48,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
             IndividuoEmViolacao? individuo = null;
 
-            foreach (string idItem in Request.Form[ITENS_ATENDIDOS])
+            foreach (string idItem in Request.Form[Item.ITENS_ATENDIDOS])
             {
                 var id = int.Parse(idItem);
 

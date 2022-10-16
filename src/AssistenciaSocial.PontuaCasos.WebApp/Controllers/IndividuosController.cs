@@ -97,9 +97,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             individuoDb.Caso!.ModificadoEm = DateTime.Now;
             individuoDb.Caso.ModificadoPorId = user.Id;
 
-            for (int i = 0; i < Request.Form[ViolenciasController.ITENS_VIOLENCIAS].Count; i++)
+            for (int i = 0; i < Request.Form[Item.ITENS_VIOLENCIAS].Count; i++)
             {
-                var idViolencia = int.Parse(Request.Form[ViolenciasController.ITENS_VIOLENCIAS][i]);
+                var idViolencia = int.Parse(Request.Form[Item.ITENS_VIOLENCIAS][i]);
 
                 if (idViolencia == 0 || idViolencia == int.MaxValue)
                 {
@@ -110,9 +110,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 individuoDb.ViolenciasSofridas![i].ViolenciaId = idViolencia;
             }
 
-            for (int i = 0; i < Request.Form[ViolenciasController.ITENS_SITUACAO_VIOLENCIAS].Count; i++)
+            for (int i = 0; i < Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS].Count; i++)
             {
-                var idSituacao = int.Parse(Request.Form[ViolenciasController.ITENS_SITUACAO_VIOLENCIAS][i]);
+                var idSituacao = int.Parse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][i]);
 
                 if (idSituacao != 0 && idSituacao != int.MaxValue)
                 {
@@ -122,9 +122,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 }
             }
  
-            for (int i = 0; i < Request.Form[SaudeController.ITENS_SAUDE].Count; i++)
+            for (int i = 0; i < Request.Form[Item.ITENS_SAUDE].Count; i++)
             {
-                var idSaude = int.Parse(Request.Form[SaudeController.ITENS_SAUDE][i]);
+                var idSaude = int.Parse(Request.Form[Item.ITENS_SAUDE][i]);
                 var saude = await _context.Itens.FirstAsync(s => s.Id == idSaude);
 
                 individuoDb.SituacoesDeSaude![i] = saude;

@@ -7,7 +7,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class SaudeController : Controller
     {
-        internal const string ITENS_SAUDE = "Condições da Pessoa em Violação";
         private readonly PontuaCasosContext _context;
 
         public SaudeController(PontuaCasosContext context)
@@ -40,7 +39,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(u => u.Organizacoes)
                 .First(u => User.Identity != null && u.Email == User.Identity.Name);
 
-            var idSaude = int.Parse(Request.Form[ITENS_SAUDE][0]);
+            var idSaude = int.Parse(Request.Form[Item.ITENS_SAUDE][0]);
 
             var saude = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idSaude);
 
@@ -80,7 +79,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         internal static List<Item> ConsultarItens(PontuaCasosContext context)
         {
-            var itens = context.Itens.Include(i => i.Itens).Where(i => i.Titulo == ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
+            var itens = context.Itens.Include(i => i.Itens).Where(i => i.Titulo == Item.ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
 
             foreach (var item in itens)
             {

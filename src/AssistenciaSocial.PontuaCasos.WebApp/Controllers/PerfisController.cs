@@ -14,17 +14,20 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     {
         private readonly PontuaCasosContext _context;
 
-        public PerfisController(PontuaCasosContext context)
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public PerfisController(PontuaCasosContext context, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _roleManager = roleManager;
         }
 
         // GET: Perfis
         public async Task<IActionResult> Index()
         {
-              return _context.Roles != null ? 
-                          View(await _context.Roles.ToListAsync()) :
-                          Problem("Entity set 'PontuaCasosContext.Perfil'  is null.");
+            return _context.Roles != null ?
+                        View(await _context.Roles.ToListAsync()) :
+                        Problem("Entity set 'PontuaCasosContext.Perfil'  is null.");
         }
 
         // GET: Perfis/Details/5
@@ -60,8 +63,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(perfil);
-                await _context.SaveChangesAsync();
+                IdentityResult result = await _roleManager.CreateAsync(perfil);
                 return RedirectToAction(nameof(Index));
             }
             return View(perfil);
@@ -150,14 +152,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 _context.Roles.Remove(perfil);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool PerfilExists(string id)
         {
-          return (_context.Roles?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Roles?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

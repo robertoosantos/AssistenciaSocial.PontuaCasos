@@ -5,6 +5,11 @@ using System.ComponentModel;
 namespace AssistenciaSocial.PontuaCasos.WebApp.Models;
 public class Item : ModelBaseControle
 {
+    internal const string ITENS_ATENDIDOS = "Ciclos de Vida";
+    internal const string ITENS_SAUDE = "Condições da Pessoa em Violação";
+    internal const string ITENS_VIOLENCIAS = "Violências";
+    internal const string ITENS_SITUACAO_VIOLENCIAS = "Situações das Violências";
+    
     public int Id { get; set; }
     [DisplayName("Título")]
     public string Titulo { get; set; } = null!;
