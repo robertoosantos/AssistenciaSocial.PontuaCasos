@@ -47,12 +47,8 @@ jobs:
         with:
           name: .net-app
 
-      - task: DotNetCoreCLI@2
-        displayName: Create SQL Scripts
-        inputs:
-          command: custom
-          custom: 'ef '
-          arguments: migrations script --output $(Build.SourcesDirectory)\pontuacasos.sql --idempotent --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
+      - name: dotnet ef migrations
+        run: dotnet ef migrations script --output ${{env.DOTNET_ROOT}}\build\pontuacasos.sql --idempotent --project src/AssistenciaSocial.PontuaCasos.WebApp/AssistenciaSocial.PontuaCasos.WebApp.csproj
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
