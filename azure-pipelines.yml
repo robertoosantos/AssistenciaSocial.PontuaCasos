@@ -48,7 +48,7 @@ steps:
   inputs:
     azureSubscription: 'Azure subscription 1(fbb97c5c-09ae-4eb5-98e3-c4cfe9b5b4e6)'
     appType: 'webAppLinux'
-    appName: 'pontuacasos'
+    appName: 'indicadoresderisco'
     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
 
 - task: SqlDacpacDeploymentOnMachineGroup@0
