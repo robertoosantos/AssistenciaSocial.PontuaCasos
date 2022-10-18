@@ -9,7 +9,7 @@ Tabela de conteúdos
    * [Sobre](#Sobre)
    * [Tabela de Conteudo](#tabela-de-conteudo)
    * [Como usar](#como-usar)
-      * [Pre Requisitos](#pre-requisitos)
+      * [Pré-Requisitos](#pré-requisitos)
       * [Rodando a aplicação](#rodando-a-aplicação)
       * [Deploy](#deploy)
    * [Funcionalidades](#funcionalidades)
