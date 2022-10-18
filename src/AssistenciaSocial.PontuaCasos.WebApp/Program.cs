@@ -24,11 +24,14 @@ builder.Services.AddDefaultIdentity<Usuario>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<PontuaCasosContext>();
 
-builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+if (builder.Configuration["Authentication:Google:ClientId"] != null && builder.Configuration["Authentication:Google:ClientSecret"] != null)
 {
-    googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-});
+    builder.Services.AddAuthentication().AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    });
+}
 
 var app = builder.Build();
 
