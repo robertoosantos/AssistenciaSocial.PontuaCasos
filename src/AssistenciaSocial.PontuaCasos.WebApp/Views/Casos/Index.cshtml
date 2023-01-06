@@ -10,7 +10,10 @@
     <a asp-action="Create" class="btn btn-primary">Registar Novo Caso</a>
 </p>
 <p class="d-flex justify-content-end">
-    <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
+    @if (User.IsInRole(Perfil.PERFIL_GESTORES))
+    {
+        <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
+    }
     <a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info ms-2">Meus Casos Ativos</a>
     <a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info ms-2">Meus Casos Inativos</a>
 </p>
@@ -82,7 +85,7 @@
                         {
                             <li>
                                 <a asp-action="EditConfirmed" asp-route-id="@item.Id" class="btn btn-danger"
-                                    onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
+                            onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
                                     Atualização</a>
                             </li>
                         }
