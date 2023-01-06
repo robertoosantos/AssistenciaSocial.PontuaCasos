@@ -21,6 +21,6 @@ ENV DatabasePassword=Pontuacasos!
 
 # dotnet tools
 RUN dotnet tool install -g dotnet-ef
-RUN dotnet tool install -g dotnet-aspnet-codegenerator
+RUN dotnet tool install -g dotnet-aspnet-codegenerator --version 6.0.11
 
 ENV PATH="${PATH}:/home/vscode/.dotnet/tools"
