@@ -381,6 +381,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             PreencherItensFamiliares(casoDb);
 
+            casoDb.Titulo = caso.Titulo;
+            casoDb.ResponsavelFamiliar = caso.ResponsavelFamiliar;
+            casoDb.Prontuario = caso.Prontuario;
             casoDb.ModificadoEm = DateTime.Now;
             casoDb.ModificadoPorId = user.Id;
 
