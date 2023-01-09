@@ -17,8 +17,8 @@ public class Caso : ModelBaseControle
     [DisplayName("Responsável Familiar")]
     [Required(ErrorMessage="Responsável familiar é obrigatório")]
     public string ResponsavelFamiliar { get; set; } = null!;
-    [DisplayName("Título")]
-    [Required(ErrorMessage="Título é obrigatório")]
+    [DisplayName("Caso")]
+    [Required(ErrorMessage="Caso é obrigatório")]
     public string Titulo { get; set; } = null!;
     [DisplayName("Número do Prontuário")]
     public string? Prontuario { get; set; } = null!;
