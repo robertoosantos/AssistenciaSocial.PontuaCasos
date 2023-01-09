@@ -440,7 +440,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var caso = await _context.Casos.FindAsync(id);
             if (caso != null)
             {
-                _context.Casos.Remove(caso);
+                caso.Ativo = false;
             }
 
             await _context.SaveChangesAsync();
