@@ -95,7 +95,7 @@ public class Caso : ModelBaseControle
                     maiorPontuacaoIndividuo = pontuacaoIndividuo;
             }
 
-            pontos = maiorPontuacaoIndividuo;
+            pontos += maiorPontuacaoIndividuo;
         }
 
         return pontos;
