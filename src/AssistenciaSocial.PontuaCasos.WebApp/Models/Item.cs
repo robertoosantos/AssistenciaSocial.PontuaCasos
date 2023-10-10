@@ -17,7 +17,7 @@ public class Item : ModelBaseControle
     public bool Ativo { get; set; }
     [DisplayName("Referente à Família")]
     public bool UnicaPorFamilia { get; set; }
-    [DisplayName("Referente ao Atendido")]
+    [DisplayName("Identifica os Atendidos")]
     public bool UnicaPorAtendido { get; set; }
     [DisplayName("É uma categoria?")]
     public bool ECategoria { get; set; }

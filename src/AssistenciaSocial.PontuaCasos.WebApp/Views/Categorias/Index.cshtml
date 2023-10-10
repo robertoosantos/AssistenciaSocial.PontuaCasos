@@ -9,6 +9,13 @@
 <p>
     <a asp-action="Create">Criar Nova Categoria</a>
 </p>
+@if (ViewData["Alerta"].ToString().Length > 0)
+{
+    <div class="alert alert-danger" role="alert">
+    ViewData["Alerta"].ToString()
+</div>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -37,35 +44,36 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Titulo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Pontos)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnicaPorFamilia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UnicaPorAtendido)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ativo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CriadoEm)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModificadoEm)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Excluir</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titulo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pontos)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnicaPorFamilia)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnicaPorAtendido)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ativo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CriadoEm)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ModificadoEm)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Editar</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Detalhes</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Excluir</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
