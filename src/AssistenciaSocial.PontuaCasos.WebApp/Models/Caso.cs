@@ -15,10 +15,10 @@ public class Caso : ModelBaseControle
     }
 
     [DisplayName("Responsável Familiar")]
-    [Required(ErrorMessage="Responsável familiar é obrigatório")]
+    [Required(ErrorMessage = "Responsável familiar é obrigatório")]
     public string ResponsavelFamiliar { get; set; } = null!;
     [DisplayName("Caso")]
-    [Required(ErrorMessage="Caso é obrigatório")]
+    [Required(ErrorMessage = "Caso é obrigatório")]
     public string Titulo { get; set; } = null!;
     [DisplayName("Número do Prontuário")]
     public string? Prontuario { get; set; } = null!;
@@ -47,12 +47,15 @@ public class Caso : ModelBaseControle
 
         if (Individuos != null)
         {
+            var maiorPontuacaoIndividuo = 0;
+
             foreach (var individuo in Individuos)
             {
                 if (individuo.Item == null || individuo.Item.Categoria == null)
                     throw new ApplicationException("Necessário carregar as categorias das pessoas antes de calcular a pontuação do caso.");
 
-                pontos += individuo.Item.Categoria.Pontos * individuo.Item.Pontos;
+
+                var pontuacaoIndividuo = individuo.Item.Categoria.Pontos * individuo.Item.Pontos;
 
                 if (individuo.ViolenciasSofridas != null)
                 {
@@ -73,7 +76,7 @@ public class Caso : ModelBaseControle
                             pontosSituacaoAtual = violencia.Situacao.Pontos;
                         }
 
-                        pontos += pontosCategoria * itemViolencia.Pontos + pontosSituacao * pontosSituacaoAtual;
+                        pontuacaoIndividuo += pontosCategoria * itemViolencia.Pontos + pontosSituacao * pontosSituacaoAtual;
                     }
                 }
 
@@ -84,10 +87,15 @@ public class Caso : ModelBaseControle
                         if (saude.Categoria == null)
                             throw new ApplicationException("Necessário carregar as categorias das condições da pessoa antes de calcular a pontuação do caso.");
 
-                        pontos += saude.Categoria.Pontos * saude.Pontos;
+                        pontuacaoIndividuo += saude.Categoria.Pontos * saude.Pontos;
                     }
                 }
+
+                if (pontuacaoIndividuo > maiorPontuacaoIndividuo)
+                    maiorPontuacaoIndividuo = pontuacaoIndividuo;
             }
+
+            pontos = maiorPontuacaoIndividuo;
         }
 
         return pontos;
