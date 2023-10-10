@@ -11,9 +11,12 @@
 </p>
 @if (ViewData["Alerta"].ToString().Length > 0)
 {
-    <div class="alert alert-danger" role="alert">
-    @ViewData["Alerta"].ToString()
-</div>
+    @foreach (var item in ViewData["Alerta"].ToString().Split("\n"))
+    {
+        <div class="alert alert-danger" role="alert">
+            @item
+        </div>
+    }
 }
 
 <table class="table">
