@@ -10,7 +10,7 @@
     <a asp-action="Create" class="btn btn-primary">Registrar Novo Caso</a>
 </p>
 <p class="d-flex justify-content-end">
-    @if (User.IsInRole(Perfil.PERFIL_GESTORES))
+    @if (User.IsInRole(AssistenciaSocial.PontuaCasos.WebApp.Models.Perfil.PERFIL_GESTORES))
     {
         <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
     }
