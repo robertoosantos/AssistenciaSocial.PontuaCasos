@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
-    [Authorize(Roles="Gestores")]
+    [Authorize(Roles = "Gestores")]
     public class UsuariosController : Controller
     {
         private readonly PontuaCasosContext _context;
@@ -44,10 +44,45 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     usuario.Organizacoes = new List<Organizacao>();
 
                 usuario.Organizacoes = user.Organizacoes;
-                
+
                 _context.Update(usuario);
 
                 await _userManager.AddToRoleAsync(usuario, Perfil.PERFIL_USUARIOS);
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Users/Delete/5
+        public async Task<IActionResult> Delete(string? id)
+        {
+            if (id == null || _context.Casos == null)
+            {
+                return NotFound();
+            }
+
+            var usuario = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            return View(usuario);
+        }
+
+        // POST: Users/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string? id)
+        {
+            var usuario = await _context.Users.Include(u => u.Organizacoes).SingleOrDefaultAsync(u => u.Id == id);
+
+            if (usuario != null && usuario.Email != User.Identity.Name)
+            {
+                _context.Users.Remove(usuario);
 
                 await _context.SaveChangesAsync();
             }
