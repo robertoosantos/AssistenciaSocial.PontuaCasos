@@ -69,14 +69,14 @@
     <h4>Sobre a família</h4>
     @if (ViewData["Editando"] != null && (bool)ViewData["Editando"] == true)
     {
-        <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Pessoa</a>        
+        <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Novo Ciclo</a>        
     }
     <hr />
     <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Categorias" />
-    <h4>Pessoas em Violação</h4>
+    <h4>Ciclos em Violação</h4>
     @if (ViewData["Editando"] != null && (bool)ViewData["Editando"] == true)
     {
-        <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Pessoa</a>        
+        <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Novo Ciclo</a>        
     }
     <hr />
     <partial name="~/Views/Shared/_IndividuosList.cshtml" model="@Model.Individuos" />
