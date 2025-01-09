@@ -98,6 +98,8 @@ public class Caso : ModelBaseControle
             pontos += maiorPontuacaoIndividuo;
         }
 
-        return pontos;
+        // Para efeito de exibição a pontuação do caso é apenas 1 décimo da 
+        // pontuação total dos itens multiplicada por suas categorias.
+        return pontos / 10;
     }
 }
