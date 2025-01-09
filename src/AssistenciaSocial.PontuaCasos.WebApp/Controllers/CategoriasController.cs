@@ -28,7 +28,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                  mensagensAlerta.AppendLine("Há mais de uma categoria ativa que Identifica os Atendidos. Por favor, marque apenas uma categoria com essa opção.");
 
             if (categoriasUsuario.Count < 1)
-                 mensagensAlerta.AppendLine("Não há uma categoria ativa que Identifica os Atendidos. Por favor, crie ou marque uma categoria com essa opção.");
+                 mensagensAlerta.AppendLine(string.Format("Não há uma categoria ativa que Identifica os Atendidos. Por favor, crie ou atualize a categoria {0} e marque esta opção.", Item.ITENS_ATENDIDOS));
 
             if (categoriasObrigatorias.Count < filtroCategoriasObrigatorias.Count)
             {

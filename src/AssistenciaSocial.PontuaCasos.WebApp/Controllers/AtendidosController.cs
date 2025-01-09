@@ -48,42 +48,49 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
             IndividuoEmViolacao? individuo = null;
 
-            foreach (string idItem in Request.Form[Item.ITENS_ATENDIDOS])
+            if (Request.Form[Item.ITENS_ATENDIDOS].Count == 0)
             {
-                var id = int.Parse(idItem);
-
-                if (id != int.MaxValue)
+                ViewBag.ErrorMessage = String.Format("{0} não foi informado.", Item.ITENS_ATENDIDOS);
+            }
+            else
+            {
+                foreach (string idItem in Request.Form[Item.ITENS_ATENDIDOS])
                 {
-                    var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
+                    var id = int.Parse(idItem);
 
-                    if (itemSelecionado != null && itemSelecionado.Categoria != null)
+                    if (id != int.MaxValue)
                     {
-                        if (caso.Individuos == null)
-                            caso.Individuos = new List<IndividuoEmViolacao>();
+                        var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
 
-                        individuo = new IndividuoEmViolacao
+                        if (itemSelecionado != null && itemSelecionado.Categoria != null)
                         {
-                            ItemId = itemSelecionado.Id,
-                            CasoId = caso.Id
-                        };
+                            if (caso.Individuos == null)
+                                caso.Individuos = new List<IndividuoEmViolacao>();
 
-                        caso.Individuos.Add(individuo);
+                            individuo = new IndividuoEmViolacao
+                            {
+                                ItemId = itemSelecionado.Id,
+                                CasoId = caso.Id
+                            };
+
+                            caso.Individuos.Add(individuo);
+                        }
                     }
                 }
+
+                caso.ModificadoEm = DateTime.Now;
+                caso.ModificadoPorId = user.Id;
+
+                ModelState.Clear();
+                if (!TryValidateModel(caso, nameof(caso)))
+                {
+                    return View(ConsultarItens());
+                }
+
+                _context.Update(caso);
+                await _context.SaveChangesAsync();
             }
-
-            caso.ModificadoEm = DateTime.Now;
-            caso.ModificadoPorId = user.Id;
-
-            ModelState.Clear();
-            if (!TryValidateModel(caso, nameof(caso)))
-            {
-                return View(ConsultarItens());
-            }
-
-            _context.Update(caso);
-            await _context.SaveChangesAsync();
-
+            
             if (individuo != null)
                 return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo.Id });
             else
