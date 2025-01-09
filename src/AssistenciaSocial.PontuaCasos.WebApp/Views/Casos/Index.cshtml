@@ -1,5 +1,4 @@
 @model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Caso>
-
 @{
     ViewData["Title"] = "Lista de Casos";
 }
@@ -85,7 +84,7 @@
                         {
                             <li>
                                 <a asp-action="EditConfirmed" asp-route-id="@item.Id" class="btn btn-danger"
-                            onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
+                                   onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
                                     Atualização</a>
                             </li>
                         }
@@ -104,3 +103,15 @@
         }
     </tbody>
 </table>
+
+<div class="d-flex justify-content-center">
+    <div class="btn-group" role="group" aria-label="Pagination">
+        <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info @((ViewBag.Filtro == "todos") ? "active" : "")">Todos</a>
+        <a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info @((ViewBag.Filtro == "ativos") ? "active" : "")">Meus Casos Ativos</a>
+        <a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info @((ViewBag.Filtro == "inativos") ? "active" : "")">Meus Casos Inativos</a>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center mt-3">
+    <pager total-items="Model.Count()" page-size="10" current-page="1" page-url="@Url.Action("Index")"></pager>
+</div>

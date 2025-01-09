@@ -36,31 +36,50 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Casos
-        public async Task<IActionResult> Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro, int page = 1, int pageSize = 10)
         {
             var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+
+            IQueryable<Caso> casosQuery = null;
 
             switch (filtro)
             {
                 case "todos":
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                    casosQuery = GerarIncludes(_context.Casos);
+                    break;
                 case "inativos":
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .Where(c => c.Ativo == false && c.CriadoPorId == user.Id)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                    casosQuery = GerarIncludes(_context.Casos)
+                                    .Where(c => c.Ativo == false && c.CriadoPorId == user.Id);
+                    break;
                 default:
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .Where(c => c.Ativo == true && c.CriadoPorId == user.Id)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                    casosQuery = GerarIncludes(_context.Casos)
+                                    .Where(c => c.Ativo == true && c.CriadoPorId == user.Id);
+                    break;
             }
 
+            var totalItems = await casosQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            if (page < 1)
+                page = 1;
+            else if (page > totalPages)
+                page = totalPages;
+
+            var casos = await casosQuery
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+
+            var viewModel = new CasosIndexViewModel
+            {
+                Casos = casos,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages
+            };
+
+            return View(viewModel);
         }
 
         // GET: Casos/History
