@@ -35,9 +35,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(i => i.Caso)
                 .First(i => i.Id == individuo_id);
 
+            if (individuo.Caso == null)
+            {
+                ViewData["Erro"] = "Não é possível criar um indivíduo sem um caso associado.";
+                return View(ConsultarItens());
+            }
+
             var user = _context.Users
                 .Include(u => u.Organizacoes)
-                .First(u => User.Identity != null && u.Email == User.Identity.Name);
+                .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
             var idSaude = int.Parse(Request.Form[Item.ITENS_SAUDE][0]);
 
@@ -122,14 +128,14 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return Problem("Entity set 'PontuaCasosContext.Itens'  is null.");
             }
             var individuo = await _context.IndividuosEmViolacoes.Include(i => i.SituacoesDeSaude).SingleOrDefaultAsync(i => i.Id == individuo_id);
-            if (individuo != null)
+            if (individuo != null && individuo.SituacoesDeSaude != null)
             {
                 int i = individuo.SituacoesDeSaude.FindIndex(s => s.Id == id);
                 individuo.SituacoesDeSaude.RemoveAt(i);
+                _context.Update(individuo);
+                await _context.SaveChangesAsync();
             }
 
-            _context.Update(individuo);
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo_id });
         }
 

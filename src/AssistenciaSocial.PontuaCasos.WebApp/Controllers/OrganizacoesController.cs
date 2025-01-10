@@ -60,7 +60,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Nome")] Organizacao organizacao)
         {
-            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => u.Email == User.Identity!.Name);
 
             organizacao.ModificadoEm = DateTime.Now;
             organizacao.CriadoEm = organizacao.ModificadoEm;

@@ -49,7 +49,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string? categoria_id, [Bind("Id,Titulo,Pontos,UnicaPorFamilia,UnicaPorAtendido")] Item item)
         {
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity!.Name);
 
             if (user.Organizacoes is not null)
                 item.Organizacao = user.Organizacoes.First();
@@ -106,7 +106,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return NotFound();
             }
 
-            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => u.Email == User.Identity!.Name);
             item.ModificadoEm = DateTime.Now;
             item.ModificadoPorId = user.Id;
 
@@ -171,7 +171,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Categorias", new { id = item.CategoriaId });
+            return RedirectToAction("Details", "Categorias", new { id = item!.CategoriaId });
         }
 
         private bool ItemExists(int id)

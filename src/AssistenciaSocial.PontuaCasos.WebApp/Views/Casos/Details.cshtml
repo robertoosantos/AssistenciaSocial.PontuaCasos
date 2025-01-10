@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Detalhes do Caso";
+    bool estaEditando = ViewData["Editando"] is bool editing && editing;
+
 }
 
 <h1>Detalhes do Caso</h1>
@@ -67,14 +69,14 @@
 </div>
 <div>
     <h4>Sobre a família</h4>
-    @if (ViewData["Editando"] != null && (bool)ViewData["Editando"] == true)
+    @if (estaEditando)
     {
         <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Novo Ciclo</a>        
     }
     <hr />
     <partial name="~/Views/Shared/_CategoriaList.cshtml" model="@Model.Categorias" />
     <h4>Ciclos em Violação</h4>
-    @if (ViewData["Editando"] != null && (bool)ViewData["Editando"] == true)
+    @if (estaEditando)
     {
         <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id" class="btn btn-primary">Adicionar Novo Ciclo</a>        
     }
