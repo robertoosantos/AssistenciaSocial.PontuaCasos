@@ -48,10 +48,9 @@
 <br />
 <br />
 <div>
-    <h4>Pessoas em Violação</h4>
+    <h4>Ciclos em Violação</h4>
     <a asp-action="Create" asp-controller="Atendidos" asp-route-caso_id="@Model.Id"
-        class="btn btn-outline-primary">Adicionar
-        Pessoa</a>
+        class="btn btn-outline-primary">Adicionar Novo Ciclo em Violação</a>
     <hr />
     <partial name="~/Views/Shared/_IndividuosList.cshtml" model="@Model.Individuos" />
 </div>
@@ -61,6 +60,6 @@
 @if (ViewData["CasoAtualizado"] != null)
 {
     <script>
-        alert("Atualização realizada com sucesso!");
-    </script>
+    alert("Atualização realizada com sucesso!");
+</script>
 }

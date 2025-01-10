@@ -65,7 +65,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
             catch (DbUpdateException)
             {
-                ViewData["Erro"] = "Esta pessoa já possui registro desta condição.";
+                ViewData["Erro"] = "Este ciclo já possui registro desta condição.";
                 return View(ConsultarItens());
             }
 
