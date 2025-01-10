@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.EntityFrameworkCore;
+using AssistenciaSocial.PontuaCasos.WebApp.Servicos;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers;
 
@@ -9,11 +10,13 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly PontuaCasosContext _context;
+    private readonly CasoService _servicoDeCasos;
 
     public HomeController(ILogger<HomeController> logger, PontuaCasosContext context)
     {
         _logger = logger;
         _context = context;
+        _servicoDeCasos = new CasoService(_context);
     }
 
     public async Task<IActionResult> Index()
@@ -22,11 +25,11 @@ public class HomeController : Controller
 
         if (User!.Identity!.IsAuthenticated)
         {
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            var user = await _context.Users.Include(u => u.Organizacoes).FirstAsync(u => u.Email == User.Identity.Name);
 
-            home.CasosEmAtualizacao = CasosController.GerarIncludes(_context.Casos).Where(c => c.EmAtualizacao == true && (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id)).ToList();
+            home.CasosEmAtualizacao = await _servicoDeCasos.IncluirDadosDoCaso().Where(c => c.Ativo && c.EmAtualizacao == true && (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id)).ToListAsync();
 
-            home.CasosSemAtualizacao = CasosController.GerarIncludes(_context.Casos).Where(c => (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id) && EF.Functions.DateDiffMonth(c.ModificadoEm, DateTime.Now) >= 6).ToList();
+            home.CasosSemAtualizacao = await _servicoDeCasos.IncluirDadosDoCaso().Where(c => c.Ativo && (c.CriadoPorId == user.Id || c.ModificadoPorId == user.Id) && EF.Functions.DateDiffMonth(c.ModificadoEm, DateTime.Now) >= 6).ToListAsync();
         }
 
         return View(home);

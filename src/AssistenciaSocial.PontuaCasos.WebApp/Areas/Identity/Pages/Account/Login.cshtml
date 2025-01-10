@@ -45,7 +45,7 @@
         </section>
     </div>
     @{
-        if ((Model.ExternalLogins?.Count ?? 0) > 0)
+        if (Model.ExternalLogins != null && Model.ExternalLogins.Count > 0)
         {
             <div class="col-md-6 col-md-offset-2">
                 <section>

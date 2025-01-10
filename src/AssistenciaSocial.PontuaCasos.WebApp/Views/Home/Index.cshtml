@@ -5,7 +5,7 @@
     ViewData["Title"] = "Início";
 }
 
-@if (User.Identity.IsAuthenticated)
+@if (User.Identity != null && User.Identity.IsAuthenticated)
 {
     @if (!User.IsInRole(Perfil.PERFIL_USUARIOS))
     {

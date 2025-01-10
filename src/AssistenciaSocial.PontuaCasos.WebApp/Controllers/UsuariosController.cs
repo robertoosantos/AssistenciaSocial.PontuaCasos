@@ -36,7 +36,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var user = _context.Users
                 .Include(u => u.Organizacoes)
-                .First(u => User.Identity != null && u.Email == User.Identity.Name);
+                .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
             if (usuario != null)
             {
@@ -81,7 +81,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             var usuario = await _context.Users.Include(u => u.Organizacoes).SingleOrDefaultAsync(u => u.Id == id);
 
-            if (usuario != null && usuario.Email != User.Identity.Name)
+            if (usuario != null && usuario.Email != User.Identity!.Name)
             {
                 usuario.Organizacoes = null;
                 await _userManager.SetLockoutEndDateAsync(usuario, DateTimeOffset.MaxValue);

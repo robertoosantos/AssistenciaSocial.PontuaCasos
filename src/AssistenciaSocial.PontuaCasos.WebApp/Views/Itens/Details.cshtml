@@ -44,7 +44,7 @@
             @Html.DisplayNameFor(model => model.CriadoPor)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CriadoPor.Id)
+            @Html.DisplayFor(model => model.CriadoPor!.UserName)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ModificadoEm)
@@ -56,11 +56,11 @@
             @Html.DisplayNameFor(model => model.ModificadoPor)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ModificadoPor.Id)
+            @Html.DisplayFor(model => model.ModificadoPor!.UserName)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Id">Editar</a> |
     <a asp-action="Details" asp-controller="Categorias" asp-route-id="@Model.CategoriaId">Voltar para Categoria</a>
 </div>

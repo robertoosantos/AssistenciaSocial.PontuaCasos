@@ -88,11 +88,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Titulo,Pontos,UnicaPorFamilia,UnicaPorAtendido")] Item item)
         {
-            if (User == null || User.Identity == null){
-                return Problem("Você precisa estar logado para criar um novo caso.");
-            }
-
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity!.Name);
 
             if (user.Organizacoes is not null)
                 item.Organizacao = user.Organizacoes.First();
@@ -143,7 +139,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return NotFound();
             }
 
-            var user = _context.Users.First(u => u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => u.Email == User.Identity!.Name);
             item.ECategoria = true;
             item.ModificadoEm = DateTime.Now;
             item.ModificadoPorId = user.Id;

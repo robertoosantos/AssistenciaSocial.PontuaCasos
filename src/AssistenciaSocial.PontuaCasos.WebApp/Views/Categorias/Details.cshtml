@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Detalhes da Categoria";
+
+    int id = Model.Id;
 }
 
 <h1>Detalhes</h1>
@@ -55,8 +57,8 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Create" asp-controller="Itens" asp-route-categoria_id="@Model.Id">Adicionar Itens</a> |
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Editar</a> |
+    <a asp-action="Create" asp-controller="Itens" asp-route-categoria_id="@id">Adicionar Itens</a> |
+    <a asp-action="Edit" asp-route-id="@id">Editar</a> |
     <a asp-action="Index">Voltar</a>
 </div>
 @if (Model.Itens != null)

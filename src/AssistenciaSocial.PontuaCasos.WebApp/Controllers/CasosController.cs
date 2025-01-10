@@ -1,214 +1,67 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
-using Microsoft.EntityFrameworkCore.Query;
+using AssistenciaSocial.PontuaCasos.WebApp.Servicos;
+using Microsoft.EntityFrameworkCore;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 {
     public class CasosController : Controller
     {
+        private readonly CasoService _servicoDeCasos;
         private readonly PontuaCasosContext _context;
 
-        public CasosController(PontuaCasosContext context)
+        public CasosController(PontuaCasosContext contexto)
         {
-            _context = context;
+            _context = contexto;
+            _servicoDeCasos = new CasoService(_context);
         }
 
-        public static IQueryable<Caso> GerarIncludes(DbSet<Caso> caso)
-        {
-            return caso.Include(c => c.ItensFamiliares!)
-                                .ThenInclude(i => i.Categoria)
-                                .Include(c => c.Individuos!)
-                                .ThenInclude(i => i.Item!)
-                                .ThenInclude(i => i.Categoria)
-                                .Include(c => c.Individuos!)
-                                .ThenInclude(i => i.ViolenciasSofridas!)
-                                .ThenInclude(v => v.Violencia!)
-                                .ThenInclude(v => v.Categoria)
-                                .Include(c => c.Individuos!)
-                                .ThenInclude(i => i.ViolenciasSofridas!)
-                                .ThenInclude(v => v.Situacao)
-                                .ThenInclude(s => s.Categoria)
-                                .Include(c => c.Individuos!)
-                                .ThenInclude(i => i.SituacoesDeSaude!)
-                                .ThenInclude(ss => ss.Categoria)
-                                .AsSplitQuery();
-        }
+        /// <summary>
+        /// Exemplo de como carregar o usuário atual, assumindo que User.Identity.Name == id do usuário (string).
+        /// Ajuste conforme sua forma real de autenticação/identificação de usuário.
+        /// </summary>
+        private Usuario UsuarioAtual =>
+            _context.Users
+                .Include(u => u.Organizacoes)
+                .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
         // GET: Casos
         public async Task<IActionResult> Index(string? filtro)
         {
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
-
-            switch (filtro)
+            try
             {
-                case "todos":
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
-                case "inativos":
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .Where(c => c.Ativo == false && c.CriadoPorId == user.Id)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
-                default:
-                    return _context.Casos != null ?
-                            View(await GerarIncludes(_context.Casos)
-                                    .Where(c => c.Ativo == true && c.CriadoPorId == user.Id)
-                                    .ToListAsync()) :
-                            Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+                var usuario = UsuarioAtual; // userId é string
+                var idUsuario = usuario.Id;  // string
+                var lista = await _servicoDeCasos.ListarCasosPorFiltroAsync(filtro, idUsuario);
+                return View(lista);
             }
-
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
         }
 
         // GET: Casos/History
         public async Task<IActionResult> History(int? id)
         {
-            return _context.Casos != null ?
-                    View(await _context.Casos
-                            .TemporalAll()
-                            .Where(c => c.Id == id)
-                            .OrderByDescending(c => EF.Property<DateTime>(c, "ValidoAte"))
-                            .ToListAsync()) :
-                    Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
+            if (!id.HasValue)
+                return NotFound();
+
+            var historico = await _servicoDeCasos.ObterHistoricoDeCasoAsync(id.Value);
+            return View(historico);
         }
 
         // GET: Casos/Details/5
-        public async Task<IActionResult> Details(int? id, DateTime? modificado_em)
+        public async Task<IActionResult> Details(int? id, DateTime? modificadoEm)
         {
-            if (id == null || _context.Casos == null)
-            {
+            if (!id.HasValue)
                 return NotFound();
-            }
 
-            var caso = await ConsultarItem(id, modificado_em);
-
+            var caso = await _servicoDeCasos.ObterDetalhesTemporaisDeCasoAsync(id, modificadoEm);
             if (caso == null)
-            {
                 return NotFound();
-            }
 
             return View(caso);
-        }
-
-        private async Task<Caso?> ConsultarItem(int? id, DateTime? modificadoEm)
-        {
-            if (modificadoEm == null)
-                return await ConsultarItem(id);
-
-            var caso = await _context.Casos
-            .TemporalAll()
-            .FirstOrDefaultAsync(m => m.Id == id && m.ModificadoEm >= modificadoEm.Value);
-
-            if (caso == null)
-            {
-                return null;
-            }
-
-            var individuos = await _context.IndividuosEmViolacoes
-                                .TemporalAsOf(modificadoEm.Value)
-                                .Where(iv => iv.CasoId == caso.Id).ToListAsync();
-
-            caso.ItensFamiliares = await _context.ItensFamiliares
-                                    .TemporalAsOf(modificadoEm.Value)
-                                    .Join(_context.Itens,
-                                    i => i.ItemFamiliarId,
-                                    it => it.Id,
-                                    (i, it) => new { i, it })
-                                    .Where(ifa => ifa.i.CasoId == caso.Id)
-                                    .Select(ifa => ifa.it)
-                                    .Include(i => i.Categoria)
-                                    .ToListAsync();
-
-            foreach (var i in individuos)
-            {
-                i.Item = await _context.Itens.Include(i => i.Categoria).FirstAsync(it => it.Id == i.ItemId);
-
-                i.ViolenciasSofridas = await _context.ViolenciasSofridas
-                                        .TemporalAsOf(modificadoEm.Value)
-                                        .Where(vs => vs.IndividuoEmViolacao.Id == i.Id)
-                                        .ToListAsync();
-
-                i.SituacoesDeSaude = await _context.SitaucoesIndivididuo
-                                        .TemporalAsOf(modificadoEm.Value)
-                                        .Join(_context.Itens,
-                                        s => s.ItemSaudeId,
-                                        i => i.Id,
-                                        (s, i) => new { i, s })
-                                        .Where(si => si.s.IndividuoId == i.Id)
-                                        .Select(x => x.i)
-                                        .Include(x => x.Categoria)
-                                        .ToListAsync();
-
-                foreach (var v in i.ViolenciasSofridas)
-                {
-                    v.Violencia = await _context.Itens
-                                    .Include(i => i.Categoria)
-                                    .FirstOrDefaultAsync(i => i.Id == v.ViolenciaId);
-
-                    if (v.SituacaoId != null && v.SituacaoId > 0)
-                        v.Situacao = await _context.Itens
-                                        .Include(i => i.Categoria)
-                                        .FirstOrDefaultAsync(i => i.Id == v.SituacaoId);
-                }
-            }
-
-            caso.Individuos = individuos;
-            AgruparCategorias(caso);
-
-            return caso;
-        }
-
-        private void AgruparCategorias(Caso caso)
-        {
-            var categorias = new Dictionary<int, Item>();
-
-            if (caso.ItensFamiliares != null)
-            {
-                foreach (var item in caso.ItensFamiliares)
-                {
-                    if (item.CategoriaId != null)
-                    {
-                        Item? existe;
-
-                        var categoria = _context.Itens.First(i => i.Id == item.CategoriaId);
-
-                        if (categorias.TryGetValue((int)item.CategoriaId, out existe))
-                        {
-                            if (existe.Itens != null)
-                                existe.Itens.Add(item);
-                        }
-                        else
-                        {
-
-                            categoria.Itens = new List<Item>();
-                            categoria.Itens.Add(item);
-                            categorias.Add((int)item.CategoriaId, categoria);
-                        }
-                    }
-                }
-            }
-
-            caso.Categorias = categorias.Values.ToList();
-        }
-
-        private async Task<Caso?> ConsultarItem(int? id)
-        {
-            var caso = await GerarIncludes(_context.Casos)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-
-            if (caso == null)
-            {
-                return null;
-            }
-
-
-            AgruparCategorias(caso);
-
-            return caso;
         }
 
         // GET: Casos/Create
@@ -218,61 +71,29 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return View();
         }
 
-        private List<ViewModelCategoriaFamiliar> ConsultarCategorias(Caso? caso)
-        {
-            var retorno = new List<ViewModelCategoriaFamiliar>();
-
-            var categorias = _context.Itens.IncludeSubItensAtivos().Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
-
-            foreach (var categoria in categorias)
-            {
-                var vmCategoria = new ViewModelCategoriaFamiliar();
-                vmCategoria.Categoria = categoria;
-                vmCategoria.Itens = new List<ViewModelItemFamiliar>();
-
-                if (categoria.Itens == null)
-                    break;
-
-                foreach (var item in categoria.Itens)
-                {
-                    var selecionado = false;
-
-                    if (caso != null && caso.ItensFamiliares != null)
-                        selecionado = caso.ItensFamiliares.Exists(i => i.Id == item.Id);
-
-                    vmCategoria.Itens.Add(new ViewModelItemFamiliar
-                    {
-                        Item = item,
-                        Selecionado = selecionado
-                    });
-                }
-
-                retorno.Add(vmCategoria);
-            }
-
-            return retorno;
-        }
-
         // POST: Casos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,CriadoPorId,ModificadoPorId")] Caso caso)
+        public async Task<IActionResult> Create(
+            [Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,CriadoPorId,ModificadoPorId")]
+            Caso caso)
         {
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+            var usuario = UsuarioAtual;
 
             PreencherItensFamiliares(caso);
 
+            // Preenche campos básicos
             caso.CriadoEm = DateTime.Now;
             caso.ModificadoEm = caso.CriadoEm;
-            caso.CriadoPorId = user.Id;
-            caso.ModificadoPorId = user.Id;
+            caso.CriadoPorId = usuario.Id;       // string
+            caso.ModificadoPorId = usuario.Id;   // string
             caso.Ativo = true;
             caso.EmAtualizacao = true;
 
-            if (user.Organizacoes != null)
-                caso.Organizacao = user.Organizacoes.First();
+            if (usuario.Organizacoes?.Any() == true)
+            {
+                caso.Organizacao = usuario.Organizacoes.First();
+            }
 
             ModelState.ClearValidationState(nameof(caso));
             if (!TryValidateModel(caso, nameof(caso)))
@@ -281,133 +102,102 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return View(caso);
             }
 
-            var novoCaso = _context.Add(caso);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Edit), new { id = novoCaso.Entity.Id });
-        }
-
-        private void PreencherItensFamiliares(Caso caso)
-        {
-            foreach (var item in Request.Form.Where(f => f.Value[0].Contains("itens")))
-            {
-                var id = int.Parse(item.Value[0].Replace("itens_", ""));
-                var itemSelecionado = _context.Itens.Include(i => i.Categoria).FirstOrDefault(i => i.Id == id);
-                if (itemSelecionado != null && itemSelecionado.CategoriaId != null)
-                {
-                    if (caso.ItensFamiliares == null)
-                        caso.ItensFamiliares = new List<Item>();
-
-                    caso.ItensFamiliares.Add(itemSelecionado);
-                }
-            }
+            var novoCaso = await _servicoDeCasos.CriarCasoAsync(caso);
+            return RedirectToAction(nameof(Edit), new { id = novoCaso.Id });
         }
 
         // GET: Casos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Casos == null)
-            {
+            if (!id.HasValue)
                 return NotFound();
-            }
 
-            var caso = await ConsultarItem(id);
+            var caso = await _servicoDeCasos.ObterDetalhesDeCasoAsync(id);
             if (caso == null)
-            {
                 return NotFound();
-            }
 
             if (!caso.EmAtualizacao)
             {
                 caso.EmAtualizacao = true;
-                _context.Update(caso);
-                await _context.SaveChangesAsync();
+                await _servicoDeCasos.AtualizarCasoAsync(caso);
             }
 
             ViewBag.Categorias = ConsultarCategorias(caso);
-
             ViewData["Editando"] = true;
 
             return View(caso);
         }
 
-        // GET: Casos/Edit/5
+        // GET: Casos/EditConfirmed/5
         public async Task<IActionResult> EditConfirmed(int? id)
         {
-            if (id == null || _context.Casos == null)
-            {
+            if (!id.HasValue)
                 return NotFound();
-            }
 
-            var caso = await _context.Casos.FindAsync(id);
+            var caso = await _servicoDeCasos.LocalizarCasoAsync(id.Value);
             if (caso == null)
-            {
                 return NotFound();
-            }
 
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+            var usuario = UsuarioAtual;
 
             caso.EmAtualizacao = false;
             caso.ModificadoEm = DateTime.Now;
-            caso.ModificadoPorId = user.Id;
+            caso.ModificadoPorId = usuario.Id; // string
 
-            _context.Update(caso);
-            await _context.SaveChangesAsync();
-
+            await _servicoDeCasos.AtualizarCasoAsync(caso);
             return RedirectToAction(nameof(Index));
         }
 
         // POST: Casos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo,CriadoEm,CriadoPorId,ModificadoPorId")] Caso caso)
+        public async Task<IActionResult> Edit(int id,
+            [Bind("Id,Titulo,Prontuario,ResponsavelFamiliar,Pontos,Ativo,CriadoEm,CriadoPorId,ModificadoPorId")]
+            Caso caso)
         {
             if (id != caso.Id)
-            {
                 return NotFound();
-            }
 
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
-            var casoDb = await _context.Casos.Include(c => c.ItensFamiliares).FirstAsync(c => c.Id == id);
+            var usuario = UsuarioAtual;
 
-            if (casoDb == null)
+            var casoBanco = await _context.Casos
+                .Include(c => c.ItensFamiliares)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (casoBanco == null)
                 return View(caso);
 
-            if (casoDb.ItensFamiliares != null)
-                casoDb.ItensFamiliares.Clear();
-            else
-                casoDb.ItensFamiliares = new List<Item>();
+            // Recarrega itens familiares
+            casoBanco.ItensFamiliares?.Clear();
+            casoBanco.ItensFamiliares ??= new List<Item>();
 
-            PreencherItensFamiliares(casoDb);
+            PreencherItensFamiliares(casoBanco);
 
-            casoDb.Titulo = caso.Titulo;
-            casoDb.ResponsavelFamiliar = caso.ResponsavelFamiliar;
-            casoDb.Prontuario = caso.Prontuario;
-            casoDb.ModificadoEm = DateTime.Now;
-            casoDb.ModificadoPorId = user.Id;
+            // Atualiza campos
+            casoBanco.Titulo = caso.Titulo;
+            casoBanco.ResponsavelFamiliar = caso.ResponsavelFamiliar;
+            casoBanco.Prontuario = caso.Prontuario;
+            casoBanco.ModificadoEm = DateTime.Now;
+            casoBanco.ModificadoPorId = usuario.Id; // string
 
             ModelState.Clear();
-            if (!TryValidateModel(casoDb, nameof(caso)))
+            if (!TryValidateModel(casoBanco, nameof(caso)))
             {
                 return View(caso);
             }
 
             try
             {
-                _context.Update(casoDb);
+                _context.Update(casoBanco);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CasoExists(casoDb.Id))
+                if (!_context.Casos.Any(e => e.Id == casoBanco.Id))
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return RedirectToAction(nameof(Index));
@@ -416,17 +206,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         // GET: Casos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Casos == null)
-            {
+            if (!id.HasValue)
                 return NotFound();
-            }
 
-            var caso = await _context.Casos
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var caso = await _servicoDeCasos.LocalizarCasoAsync(id.Value);
             if (caso == null)
-            {
                 return NotFound();
-            }
 
             return View(caso);
         }
@@ -436,23 +221,86 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Casos == null)
-            {
-                return Problem("Entity set 'PontuaCasosContext.Casos'  is null.");
-            }
-            var caso = await _context.Casos.FindAsync(id);
-            if (caso != null)
-            {
-                caso.Ativo = false;
-            }
+            var caso = await _servicoDeCasos.LocalizarCasoAsync(id);
+            if (caso == null)
+                return Problem("Caso não encontrado.");
 
-            await _context.SaveChangesAsync();
+            caso.Ativo = false;
+            await _servicoDeCasos.AtualizarCasoAsync(caso);
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CasoExists(int id)
+        #region Métodos Auxiliares
+
+        /// <summary>
+        /// Lê dados do form para popular ItensFamiliares no Caso.
+        /// Ajuste de acordo com a maneira como o seu form POSTa os dados.
+        /// </summary>
+        private void PreencherItensFamiliares(Caso caso)
         {
-            return (_context.Casos?.Any(e => e.Id == id)).GetValueOrDefault();
+            // Exemplo: a chave no form pode ser algo como "itens_123".
+            foreach (var par in Request.Form.Where(f => f.Value.Any(v => v.Contains("itens_"))))
+            {
+                foreach (var valor in par.Value)
+                {
+                    if (valor.StartsWith("itens_"))
+                    {
+                        if (int.TryParse(valor.Replace("itens_", ""), out var idItem))
+                        {
+                            var itemSelecionado = _context.Itens
+                                .Include(i => i.Categoria)
+                                .FirstOrDefault(i => i.Id == idItem);
+
+                            if (itemSelecionado != null)
+                            {
+                                caso.ItensFamiliares ??= new List<Item>();
+                                caso.ItensFamiliares.Add(itemSelecionado);
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        /// <summary>
+        /// Exemplo de consulta às categorias para exibir na tela de criação/edição.
+        /// </summary>
+        private List<ViewModelCategoriaFamiliar> ConsultarCategorias(Caso? caso)
+        {
+            var lista = new List<ViewModelCategoriaFamiliar>();
+
+            var categorias = _context.Itens
+                .IncludeSubItensAtivos()
+                .Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia)
+                .ToList();
+
+            foreach (var cat in categorias)
+            {
+                var vmCat = new ViewModelCategoriaFamiliar
+                {
+                    Categoria = cat,
+                    Itens = new List<ViewModelItemFamiliar>()
+                };
+
+                if (cat.Itens == null) 
+                    continue;
+
+                foreach (var subItem in cat.Itens)
+                {
+                    var selecionado = caso?.ItensFamiliares?.Exists(i => i.Id == subItem.Id) ?? false;
+                    vmCat.Itens.Add(new ViewModelItemFamiliar
+                    {
+                        Item = subItem,
+                        Selecionado = selecionado
+                    });
+                }
+
+                lista.Add(vmCat);
+            }
+            return lista;
+        }
+
+        #endregion
     }
 }

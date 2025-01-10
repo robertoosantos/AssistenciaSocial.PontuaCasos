@@ -8,12 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class AtendidosController : Controller
     {
         private readonly PontuaCasosContext _context;
-        private readonly Item _item;
+        private readonly ItemService _item;
 
         public AtendidosController(PontuaCasosContext context)
         {
             _context = context;
-            _item = new Item(context);
+            _item = new ItemService(context);
         }
 
         // GET: Itens/Create
@@ -33,7 +33,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public async Task<IActionResult> Create(string? caso_id, [Bind("Id,Titulo,Pontos")] Item item)
         {
             var caso = _context.Casos.Include(c => c.Individuos).First(c => caso_id != null && c.Id == int.Parse(caso_id));
-            var user = _context.Users.Include(u => u.Organizacoes).First(u => User.Identity != null && u.Email == User.Identity.Name);
+            var user = _context.Users.Include(u => u.Organizacoes).First(u => u.Email == User.Identity!.Name);
             IndividuoEmViolacao? individuo = null;
 
             if (Request.Form[Item.ITENS_ATENDIDOS].Count == 0)

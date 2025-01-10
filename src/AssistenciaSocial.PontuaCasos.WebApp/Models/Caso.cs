@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -41,7 +40,8 @@ public class Caso : ModelBaseControle
                 if (item == null || (!item.ECategoria && item.Categoria == null))
                     throw new ApplicationException("Necessário carregar as categorias dos itens antes de calcular a pontuação do caso.");
 
-                pontos += item.Categoria.Pontos * item.Pontos;
+                if (item.Categoria != null)
+                    pontos += item.Categoria.Pontos * item.Pontos;
             }
         }
 

@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Lista de Categorias";
+
+    string[] alertas = (ViewData["Alerta"]?.ToString() ?? string.Empty).Split('\n');
 }
 
 <h1>Categorias</h1>
@@ -9,9 +11,9 @@
 <p>
     <a asp-action="Create">Criar Nova Categoria</a>
 </p>
-@if (ViewData["Alerta"].ToString().Length > 0)
+@if (alertas.Length > 0)
 {
-    @foreach (var item in ViewData["Alerta"].ToString().Split("\n"))
+    @foreach (var item in alertas)
     {
         @if (!String.IsNullOrEmpty(item.Trim()))
         {

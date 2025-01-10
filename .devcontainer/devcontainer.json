@@ -12,6 +12,10 @@
 			"NODE_VERSION": "lts/*"
 		}
 	},
+	"runArgs": [
+		"--env-file",
+		"${localWorkspaceFolder}/.env"
+	],
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
