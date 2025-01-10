@@ -89,10 +89,10 @@ Um exemplo de deploy em Azure App Services poder ser encontrado em:
 - Cadastro de categorias de um caso
 - Cadastro de itens de uma categoria
 - Cadastro de casos
-- Cadastro de pessoas em violação
+- Cadastro de ciclos em violação
 - Cadastro de violências sofridas
 - Cadastro de situação das violências
-- Cadastro de condições das pessoas em violação
+- Cadastro de condições dos ciclos em violação
 - Cadastro de sistema de pontuação de casos
 
 ### Tecnologias

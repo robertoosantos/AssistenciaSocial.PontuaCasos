@@ -1,7 +1,7 @@
 @model AssistenciaSocial.PontuaCasos.WebApp.Models.IndividuoEmViolacao
 
 @{
-    ViewData["Title"] = "Editar Pessoa";
+    ViewData["Title"] = "Editar Ciclo em Violação";
 }
 
 <h1>Editar</h1>
@@ -53,7 +53,7 @@
                     }
                 </tbody>
             </table>
-            <h4>Condições da Pessoa em Violação</h4>
+            <h4>Condições do Ciclo em Violação</h4>
                 <a asp-action="Create" asp-controller="Saude" asp-route-individuo_id="@Model.Id" class="btn btn-outline-primary">Registrar Condição</a>
             <hr />
             <table class="table">

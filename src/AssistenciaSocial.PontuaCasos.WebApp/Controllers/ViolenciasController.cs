@@ -8,10 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class ViolenciasController : Controller
     {
         private readonly PontuaCasosContext _context;
+        private readonly Item _item;
 
         public ViolenciasController(PontuaCasosContext context)
         {
             _context = context;
+            _item = new Item(context);
         }
 
         // GET: Itens/Create
@@ -19,7 +21,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            List<Item> itens = ConsultarItens();
+            List<Item> itens = _item.ConsultarViolencias();
 
             return View(itens);
         }
@@ -45,7 +47,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             if (idViolencia == 0)
             {
                 ViewData["Erro"] = "Selecione uma violência.";
-                return View(ConsultarItens());
+                return View(_item.ConsultarViolencias());   
             }
 
             var violencia = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idViolencia);
@@ -67,7 +69,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             ModelState.Clear();
             if (!TryValidateModel(individuo, nameof(individuo)))
             {
-                return View(ConsultarItens());
+                return View(_item.ConsultarViolencias());
             }
 
             _context.Update(individuo);
@@ -78,33 +80,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
             catch (DbUpdateException ex)
             {
-                ViewData["Erro"] = "Esta pessoa já possui registro dessa violência.";
-                return View(ConsultarItens());
+                ViewData["Erro"] = "Este ciclo já possui registro dessa violência.";
+                return View(_item.ConsultarViolencias());
             }
 
             return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo.Id });
-        }
-
-        private List<Item> ConsultarItens()
-        {
-            return ConsultarItens(_context);
-        }
-
-        public static List<Item> ConsultarItens(PontuaCasosContext context)
-        {
-            var filtro = new List<string> { Item.ITENS_VIOLENCIAS, Item.ITENS_SITUACAO_VIOLENCIAS };
-
-            var itens = context.Itens.Include(i => i.Itens).Where(i => filtro.Contains(i.Titulo)).OrderByDescending(i => i.Pontos).ToList();
-
-            foreach (var item in itens)
-            {
-                if (item.Itens != null)
-                {
-                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
-                }
-            }
-
-            return itens;
         }
 
         // GET: Itens/Delete/5
