@@ -8,10 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class AtendidosController : Controller
     {
         private readonly PontuaCasosContext _context;
+        private readonly Item _item;
 
         public AtendidosController(PontuaCasosContext context)
         {
             _context = context;
+            _item = new Item(context);
         }
 
         // GET: Itens/Create
@@ -19,22 +21,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             ViewData["CriadoPorId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["ModificadoPorId"] = new SelectList(_context.Users, "Id", "Id");
-            List<Item> itens = ConsultarItens();
+            List<Item> itens = _item.ConsultarAtendidos();
             return View(itens);
-        }
-
-        private List<Item> ConsultarItens()
-        {
-            var itens = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorAtendido).ToList();
-            foreach (var item in itens)
-            {
-                if (item.Itens != null)
-                {
-                    item.Itens.Insert(0, new Item { Id = 0, Titulo = "", Pontos = int.MaxValue });
-                }
-            }
-
-            return itens;
         }
 
         // POST: Itens/Create
@@ -84,7 +72,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 ModelState.Clear();
                 if (!TryValidateModel(caso, nameof(caso)))
                 {
-                    return View(ConsultarItens());
+                    return View(_item.ConsultarAtendidos());
                 }
 
                 _context.Update(caso);
@@ -94,7 +82,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             if (individuo != null)
                 return RedirectToAction(nameof(IndividuosController.Edit), "Individuos", new { id = individuo.Id });
             else
-                return View(ConsultarItens());
+                return View(_item.ConsultarAtendidos());
         }
     }
 }

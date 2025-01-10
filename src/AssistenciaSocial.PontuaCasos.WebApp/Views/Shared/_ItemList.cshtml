@@ -9,6 +9,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Pontos)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ativo)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -23,9 +26,12 @@
                     @Html.DisplayFor(modelItem => item.Pontos)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-controller="Itens" asp-route-id="@item.Id">Editar</a> |
-                    <a asp-action="Details" asp-controller="Itens" asp-route-id="@item.Id">Detalhes</a> |
-                    <a asp-action="Delete" asp-controller="Itens" asp-route-id="@item.Id">Excluir</a>
+                    @Html.DisplayFor(modelItem => item.Ativo)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Itens" asp-route-id="@item.Id" asp-route-categoria_id="@item.CategoriaId">Editar</a> |
+                    <a asp-action="Details" asp-controller="Itens" asp-route-id="@item.Id" asp-route-categoria_id="@item.CategoriaId">Detalhes</a> |
+                    <a asp-action="Delete" asp-controller="Itens" asp-route-id="@item.Id" asp-route-categoria_id="@item.CategoriaId">Excluir</a>
                 </td>
             </tr>
         }

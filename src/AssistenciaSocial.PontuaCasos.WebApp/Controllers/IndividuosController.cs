@@ -8,10 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class IndividuosController : Controller
     {
         private readonly PontuaCasosContext _context;
+        private readonly Item _item;
 
         public IndividuosController(PontuaCasosContext context)
         {
             _context = context;
+            _item = new Item(context);
         }
 
         // GET: Itens/Details/5
@@ -68,7 +70,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             if (individuo != null)
             {
-                individuo.OpcoesViolencias = ViolenciasController.ConsultarItens(_context);
+                individuo.OpcoesViolencias = _item.ConsultarViolencias();
                 individuo.OpcoesSaude = SaudeController.ConsultarItens(_context);
             }
 
