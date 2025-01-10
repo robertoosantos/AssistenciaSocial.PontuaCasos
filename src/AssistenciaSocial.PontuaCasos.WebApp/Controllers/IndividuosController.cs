@@ -8,12 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class IndividuosController : Controller
     {
         private readonly PontuaCasosContext _context;
-        private readonly Item _item;
+        private readonly ItemService _item;
 
         public IndividuosController(PontuaCasosContext context)
         {
             _context = context;
-            _item = new Item(context);
+            _item = new ItemService(context);
         }
 
         // GET: Itens/Details/5
@@ -26,9 +26,9 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             var item = await _context.IndividuosEmViolacoes
                 .Include(i => i.Item)
-                .ThenInclude(i => i.CriadoPor)
+                .ThenInclude(i => i!.CriadoPor)
                 .Include(i => i.Item)
-                .ThenInclude(i => i.ModificadoPor)
+                .ThenInclude(i => i!.ModificadoPor)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (item == null)
@@ -89,7 +89,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 return NotFound();
             }
 
-            var user = _context.Users.First(u => User.Identity != null && u.Email == User.Identity.Name);
+            var user = _context.Users.First(u => u.Email == User.Identity!.Name);
             var individuoDb = _context.IndividuosEmViolacoes
                                 .Include(i => i.Caso)
                                 .Include(i => i.ViolenciasSofridas)
@@ -143,7 +143,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 _context.Update(individuoDb);
                 await _context.SaveChangesAsync();
             }   
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (!IndividuoExists(individuo.Id))
                 {

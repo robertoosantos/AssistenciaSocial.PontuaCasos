@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,6 +10,6 @@ public class ViolenciaSofrida
     public int? SituacaoId { get; set; }
     public int ViolenciaId { get; set; }
     public Item? Situacao { get; set; }
-    public Item Violencia { get; set; }
-    public IndividuoEmViolacao IndividuoEmViolacao { get; set; }
+    public Item Violencia { get; set; } = default!;
+    public IndividuoEmViolacao IndividuoEmViolacao { get; set; } = default!;
 }

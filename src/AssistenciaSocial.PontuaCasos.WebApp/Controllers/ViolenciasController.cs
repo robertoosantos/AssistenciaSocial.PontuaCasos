@@ -8,12 +8,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
     public class ViolenciasController : Controller
     {
         private readonly PontuaCasosContext _context;
-        private readonly Item _item;
+        private readonly ItemService _item;
 
         public ViolenciasController(PontuaCasosContext context)
         {
             _context = context;
-            _item = new Item(context);
+            _item = new ItemService(context);
         }
 
         // GET: Itens/Create
@@ -37,9 +37,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(i => i.Caso)
                 .First(i => i.Id == individuo_id);
 
+            if (individuo.Caso == null)
+            {
+                ViewData["Erro"] = "Não é possível criar um indivíduo sem um caso associado.";
+                return View(_item.ConsultarViolencias());  
+            }
+
             var user = _context.Users
                 .Include(u => u.Organizacoes)
-                .First(u => User.Identity != null && u.Email == User.Identity.Name);
+                .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
             var idViolencia = int.Parse(Request.Form[Item.ITENS_VIOLENCIAS][0]);
             var idSituacao = int.Parse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][0]);
@@ -78,7 +84,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 ViewData["Erro"] = "Este ciclo já possui registro dessa violência.";
                 return View(_item.ConsultarViolencias());
