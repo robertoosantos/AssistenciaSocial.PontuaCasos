@@ -63,6 +63,6 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Excluir" class="btn btn-danger" /> |
-        <a asp-action="Index" asp-controller="Home">Voltar</a>
+        <a asp-action="Details" asp-controller="Categorias" asp-route-id="@Model.CategoriaId">Voltar para Categoria</a>
     </form>
 </div>

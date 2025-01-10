@@ -171,7 +171,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Categorias", new { id = item.CategoriaId });
         }
 
         private bool ItemExists(int id)
