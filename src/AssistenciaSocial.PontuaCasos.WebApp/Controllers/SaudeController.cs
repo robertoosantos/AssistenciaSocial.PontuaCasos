@@ -79,7 +79,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
         internal static List<Item> ConsultarItens(PontuaCasosContext context)
         {
-            var itens = context.Itens.Include(i => i.Itens).Where(i => i.Titulo == Item.ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
+            var itens = context.Itens.IncludeSubItensAtivos().Where(i => i.Titulo == Item.ITENS_SAUDE).OrderByDescending(i => i.Pontos).ToList();
 
             foreach (var item in itens)
             {

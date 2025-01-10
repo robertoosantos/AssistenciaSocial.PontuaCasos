@@ -222,7 +222,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         {
             var retorno = new List<ViewModelCategoriaFamiliar>();
 
-            var categorias = _context.Itens.Include(i => i.Itens).Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
+            var categorias = _context.Itens.IncludeSubItensAtivos().Where(i => i.Ativo && i.ECategoria && i.UnicaPorFamilia).ToList();
 
             foreach (var categoria in categorias)
             {
