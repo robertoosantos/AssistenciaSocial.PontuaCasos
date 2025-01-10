@@ -12,6 +12,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
+            <th>
+                Bloqueado?
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -20,6 +23,16 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @if (item.LockoutEnd != null)
+                {
+                    <span>Sim</span>
+                }
+                else
+                {
+                    <span>Não</span>
+                }
             </td>
             <td>
                 @if (item.Organizacoes == null || item.Organizacoes.Count == 0)

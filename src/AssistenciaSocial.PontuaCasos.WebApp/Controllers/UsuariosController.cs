@@ -44,6 +44,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                     usuario.Organizacoes = new List<Organizacao>();
 
                 usuario.Organizacoes = user.Organizacoes;
+                usuario.LockoutEnd = null;
 
                 _context.Update(usuario);
 
@@ -82,8 +83,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             if (usuario != null && usuario.Email != User.Identity.Name)
             {
-                _context.Users.Remove(usuario);
-
+                usuario.Organizacoes = null;
+                await _userManager.SetLockoutEndDateAsync(usuario, DateTimeOffset.MaxValue);
                 await _context.SaveChangesAsync();
             }
 
