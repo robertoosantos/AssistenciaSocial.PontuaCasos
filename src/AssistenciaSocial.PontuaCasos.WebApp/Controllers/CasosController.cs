@@ -26,13 +26,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
         // GET: Casos
-        public async Task<IActionResult> Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro, string? busca, int pagina = 1, int tamanhoPagina = 10)
         {
             try
             {
                 var usuario = UsuarioAtual; // userId é string
                 var idUsuario = usuario.Id;  // string
-                var lista = await _servicoDeCasos.ListarCasosPorFiltroAsync(filtro, idUsuario);
+                var lista = await _servicoDeCasos.ListarCasosPorFiltroAsync(filtro, idUsuario, busca, pagina, tamanhoPagina);
+                ViewData["busca"] = busca;
+                ViewData["filtro"] = filtro;
                 return View(lista);
             }
             catch (Exception ex)

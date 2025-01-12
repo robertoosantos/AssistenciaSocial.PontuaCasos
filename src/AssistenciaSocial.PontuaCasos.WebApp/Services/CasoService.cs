@@ -20,24 +20,61 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
                 .Include(c => c.Individuos)!.ThenInclude(i => i.Item)!.ThenInclude(i => i!.Categoria)
                 .Include(c => c.Individuos)!.ThenInclude(i => i.ViolenciasSofridas)!.ThenInclude(v => v.Violencia)!.ThenInclude(v => v.Categoria)
                 .Include(c => c.Individuos)!.ThenInclude(i => i.ViolenciasSofridas)!.ThenInclude(v => v.Situacao)!.ThenInclude(s => s!.Categoria)
-                .Include(c => c.Individuos)!.ThenInclude(i => i.SituacoesDeSaude)!.ThenInclude(ss => ss.Categoria); 
+                .Include(c => c.Individuos)!.ThenInclude(i => i.SituacoesDeSaude)!.ThenInclude(ss => ss.Categoria);
         }
 
-        public async Task<List<Caso>> ListarCasosPorFiltroAsync(string? filtro, string idUsuario)
+        public IQueryable<ListaCasosViewModel> BaseListaCasos()
+        {
+            return IncluirDadosDoCaso()
+                .Select(c => new ListaCasosViewModel
+                {
+                    Id = c.Id,
+                    Pontos = c.Pontos,
+                    ResponsavelFamiliar = c.ResponsavelFamiliar,
+                    Titulo = c.Titulo,
+                    Prontuario = c.Prontuario,
+                    Ativo = c.Ativo,
+                    EmAtualizacao = c.EmAtualizacao,
+                    CriadoEm = c.CriadoEm,
+                    ModificadoEm = c.ModificadoEm,
+                    CriadoPor = c.CriadoPor!.Email,
+                    ModificadoPor = c.ModificadoPor!.Email,
+                    CriadoPorId = c.CriadoPorId
+                });
+        }
+
+        public async Task<ListaPaginavel<ListaCasosViewModel>> ListarCasosPorFiltroAsync(string? filtro, string idUsuario, string? busca, int pagina, int tamanhoPagina)
         {
             if (_contexto.Casos == null)
                 throw new InvalidOperationException("Conjunto de entidades 'PontuaCasosContext.Casos' está nulo.");
 
-            var consulta = IncluirDadosDoCaso();
-            return filtro switch
+            var consulta = BaseListaCasos();
+
+            consulta = filtro switch
             {
-                "todos" => await consulta.ToListAsync(),
-                "inativos" => await consulta
-                    .Where(c => !c.Ativo && c.CriadoPorId == idUsuario)
-                    .ToListAsync(),
-                _ => await consulta
+                "todos" => consulta,
+                "inativos" => consulta
+                    .Where(c => !c.Ativo && c.CriadoPorId == idUsuario),
+                _ => consulta
                     .Where(c => c.Ativo && c.CriadoPorId == idUsuario)
-                    .ToListAsync()
+            };
+
+            if (!String.IsNullOrEmpty(busca))
+                consulta = consulta.Where(c => c.Titulo.Contains(busca) || c.ResponsavelFamiliar.Contains(busca) || (c.Prontuario != null && c.Prontuario.Contains(busca)));
+
+            var itens = await consulta
+                .Skip((pagina - 1) * tamanhoPagina)
+                .Take(tamanhoPagina)
+                .ToListAsync();
+
+            var total = await consulta.CountAsync();
+
+            return new ListaPaginavel<ListaCasosViewModel>()
+            {
+                Itens = itens,
+                TotalItens = total,
+                Pagina = pagina,
+                TamanhoPagina = tamanhoPagina
             };
         }
 
@@ -55,7 +92,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
 
         public async Task<Caso?> ObterDetalhesDeCasoAsync(int? idCaso)
         {
-            if (!idCaso.HasValue) 
+            if (!idCaso.HasValue)
                 return null;
 
             var caso = await IncluirDadosDoCaso()
