@@ -8,10 +8,7 @@ trigger:
     include:
       - master  # Only trigger the pipeline for the main branch
 
-pr:
-  branches:
-    include:
-      - master  # Only trigger the pipeline for pull requests targeting the main branch
+pr: none
 
 pool:
   vmImage: 'windows-latest'
