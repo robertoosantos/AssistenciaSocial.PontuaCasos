@@ -23,6 +23,18 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<Item>()
+            .ToTable(
+                "Itens",
+                b => b.IsTemporal(
+                    b =>
+                    {
+                        b.HasPeriodStart("ValidoDe");
+                        b.HasPeriodEnd("ValidoAte");
+                        b.UseHistoryTable("ItensHistorico");
+                    }
+                ));
+
         modelBuilder.Entity<Caso>()
             .ToTable(
                 "Casos",
@@ -160,8 +172,9 @@ public class PontuaCasosContext : IdentityDbContext<Usuario>
                     .HasForeignKey(i => i.CasoId)
                     .HasConstraintName("FK_ItensFamiliares_Casos_CasoId")
                     .OnDelete(DeleteBehavior.ClientCascade),
-                j => {
-                    j.HasKey(it => new { it.CasoId, it.ItemFamiliarId});
+                j =>
+                {
+                    j.HasKey(it => new { it.CasoId, it.ItemFamiliarId });
                 });
 
         modelBuilder.Entity<IndividuoEmViolacao>()
