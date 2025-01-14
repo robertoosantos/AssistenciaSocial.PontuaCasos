@@ -38,8 +38,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
                     EmAtualizacao = c.EmAtualizacao,
                     CriadoEm = c.CriadoEm,
                     ModificadoEm = c.ModificadoEm,
-                    CriadoPor = c.CriadoPor!.Email,
-                    ModificadoPor = c.ModificadoPor!.Email,
+                    CriadoPor = c.CriadoPor != null && c.CriadoPor.Email != null ? c.CriadoPor.Email : "",
+                    ModificadoPor = c.ModificadoPor != null && c.ModificadoPor.Email != null ? c.ModificadoPor.Email : "",
                     CriadoPorId = c.CriadoPorId
                 });
         }

@@ -45,7 +45,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(u => u.Organizacoes)
                 .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
-            var idSaude = int.Parse(Request.Form[Item.ITENS_SAUDE][0]);
+            var idSaude = 0;
+            int.TryParse(Request.Form[Item.ITENS_SAUDE][0], out idSaude);
 
             var saude = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idSaude);
 

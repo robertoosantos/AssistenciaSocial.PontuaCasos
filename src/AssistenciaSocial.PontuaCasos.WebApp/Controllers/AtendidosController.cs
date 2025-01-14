@@ -42,9 +42,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             }
             else
             {
-                foreach (string idItem in Request.Form[Item.ITENS_ATENDIDOS])
+                foreach (string? idItem in Request.Form[Item.ITENS_ATENDIDOS])
                 {
-                    var id = int.Parse(idItem);
+                    var id = 0;
+                    
+                    int.TryParse(idItem, out id);
 
                     if (id != int.MaxValue)
                     {
