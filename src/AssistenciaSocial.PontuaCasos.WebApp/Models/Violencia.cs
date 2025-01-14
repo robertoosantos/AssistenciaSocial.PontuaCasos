@@ -8,6 +8,7 @@ public class ViolenciaSofrida
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string? Id { get; set; }
     public int? SituacaoId { get; set; }
+    public string IndividuoEmViolacaoId { get; set; } = default!;
     public int ViolenciaId { get; set; }
     public Item? Situacao { get; set; }
     public Item Violencia { get; set; } = default!;

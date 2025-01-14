@@ -1,7 +1,8 @@
-@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Caso>
+@model IEnumerable<DateTime>
 
 @{
     ViewData["Title"] = "Histórico de Casos";
+    var contagem = 0;
 }
 
 <h1>Histórico</h1>
@@ -10,16 +11,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ResponsavelFamiliar)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Titulo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Prontuario)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModificadoEm)
+                Data
             </th>
             <th></th>
     </thead>
@@ -28,21 +20,13 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ResponsavelFamiliar)
+                    @Html.DisplayFor(modelItem => item)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Titulo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Prontuario)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ModificadoEm)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" asp-route-modificado_em="@Html.Encode(item.ModificadoEm)">Detalhes</a>
+                    <a asp-action="Details" asp-route-id="@Context.GetRouteValue("id")" asp-route-modificado_em="@Html.Encode(contagem == 0 ? item.AddSeconds(1) : item)">Detalhes</a>
                 </td>
             </tr>
+            contagem++;
         }
     </tbody>
 </table>

@@ -1,7 +1,8 @@
-@model IEnumerable<AssistenciaSocial.PontuaCasos.WebApp.Models.Caso>
+@model ListaPaginavel<AssistenciaSocial.PontuaCasos.WebApp.Models.ListaCasosViewModel>
 
 @{
     ViewData["Title"] = "Lista de Casos";
+    var primeiroItem = Model.Itens.FirstOrDefault();
 }
 
 <h1>Casos</h1>
@@ -9,43 +10,49 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Registrar Novo Caso</a>
 </p>
-<p class="d-flex justify-content-end">
+<div class="d-flex justify-content-end">
     @if (User.IsInRole(AssistenciaSocial.PontuaCasos.WebApp.Models.Perfil.PERFIL_GESTORES))
     {
         <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
     }
     <a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info ms-2">Meus Casos Ativos</a>
     <a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info ms-2">Meus Casos Inativos</a>
-</p>
+    <form class="d-flex ms-2" method="get" action="@Url.Action("Index", "Casos")">
+        <input type="text" name="busca" class="form-control me-2" placeholder="Buscar casos..."
+            value="@ViewData["busca"]" />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+    </form>
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ResponsavelFamiliar)
+                @Html.DisplayNameFor(model => primeiroItem!.ResponsavelFamiliar)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Titulo)
+                @Html.DisplayNameFor(model => primeiroItem!.Titulo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Prontuario)
+                @Html.DisplayNameFor(model => primeiroItem!.Prontuario)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Pontos)
+                @Html.DisplayNameFor(model => primeiroItem!.Pontos)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Ativo)
+                @Html.DisplayNameFor(model => primeiroItem!.Ativo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CriadoEm)
+                @Html.DisplayNameFor(model => primeiroItem!.CriadoEm)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ModificadoEm)
+                @Html.DisplayNameFor(model => primeiroItem!.ModificadoEm)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Itens)
         {
             <tr>
                 <td>
@@ -85,7 +92,7 @@
                         {
                             <li>
                                 <a asp-action="EditConfirmed" asp-route-id="@item.Id" class="btn btn-danger"
-                            onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
+                                    onclick="return confirm('Tem certeza que deseja concluir a atualização deste caso e gravar uma nova versão no histórico?')">Finalizar
                                     Atualização</a>
                             </li>
                         }
@@ -104,3 +111,50 @@
         }
     </tbody>
 </table>
+
+@if (Model.TotalPaginas > 1)
+{
+    <div class="d-flex justify-content-end">
+    Página:
+
+    @if (Model.TemPaginaAnterior)
+        {
+            <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina - 1)"
+                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">Anterior</a>
+        }
+
+        @for (int i = 1; i <= Model.TotalPaginas; i++)
+        {
+            if (i == Model.Pagina)
+            {
+                <span class="mx-1">@i</span>
+            }
+            else
+            {
+                <a class="mx-1" asp-action="Index" asp-route-pagina="@(i)" asp-route-tamanhoPagina="@Model.TamanhoPagina"
+                    asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">@i</a>
+            }
+        }
+
+        @if (Model.TemProximaPagina)
+        {
+            <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina + 1)"
+                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">Próxima</a>
+        }
+        <span class="ms-5">
+            Itens por página:
+            @for (int i = 10; i <= Model.TotalItens || i <= 100; i = i * 2)
+            {
+                if (i == Model.TamanhoPagina)
+                {
+                    <span class="mx-1">@i</span>
+                }
+                else
+                {
+                    <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina)" asp-route-tamanhoPagina="@i"
+                        asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">@i</a>
+                }
+            }
+        </span>
+    </div>
+}

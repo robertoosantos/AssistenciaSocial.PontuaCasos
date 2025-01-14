@@ -1,0 +1,15 @@
+@model ListaPaginavel<ListaCasosViewModel>
+
+<div class="pagination">
+    @if (Model.TemPaginaAnterior)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.Pagina - 1)" asp-route-pageSize="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]">Anterior</a>
+    }
+
+    Página @Model.Pagina of @Model.TotalPaginas
+
+    @if (Model.TemProximaPagina)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.Pagina + 1)" asp-route-pageSize="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]">Próxima</a>
+    }
+</div>

@@ -26,13 +26,15 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
         // GET: Casos
-        public async Task<IActionResult> Index(string? filtro)
+        public async Task<IActionResult> Index(string? filtro, string? busca, int pagina = 1, int tamanhoPagina = 10)
         {
             try
             {
                 var usuario = UsuarioAtual; // userId é string
                 var idUsuario = usuario.Id;  // string
-                var lista = await _servicoDeCasos.ListarCasosPorFiltroAsync(filtro, idUsuario);
+                var lista = await _servicoDeCasos.ListarCasosPorFiltroAsync(filtro, idUsuario, busca, pagina, tamanhoPagina);
+                ViewData["busca"] = busca;
+                ViewData["filtro"] = filtro;
                 return View(lista);
             }
             catch (Exception ex)
@@ -52,12 +54,20 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         }
 
         // GET: Casos/Details/5
-        public async Task<IActionResult> Details(int? id, DateTime? modificadoEm)
+        public async Task<IActionResult> Details(int? id, string? modificado_em)
         {
             if (!id.HasValue)
                 return NotFound();
 
-            var caso = await _servicoDeCasos.ObterDetalhesTemporaisDeCasoAsync(id, modificadoEm);
+            DateTime modificadoEm;
+
+            Caso? caso = null;
+
+            if (DateTime.TryParse(modificado_em, out modificadoEm))
+                caso = await _servicoDeCasos.ObterDetalhesTemporaisDeCasoAsync(id, modificadoEm);
+            else
+                caso = await _servicoDeCasos.ObterDetalhesDeCasoAsync(id);
+
             if (caso == null)
                 return NotFound();
 
