@@ -41,15 +41,6 @@ Antes de começar, você vai precisar ter instalado em sua máquina as seguintes
 
 Esta aplicação está pronta para ser executada em container [Docker](https://www.docker.com/).
 
-Ao clonar a aplicação, altere o arquivo [Dockerfile](.devcontainer/Dockerfile), com as variáveis de ambiente do seu servidor SQL SERVER
-
-```Dockerfile
-ENV DatabaseServer
-ENV DatabaseName
-ENV DatabaseUser
-ENV DatabasePassword
-```
-
 ### Rodando a aplicação
 
 Configure as seguintes variáveis de ambiente:
@@ -58,11 +49,15 @@ Configure as seguintes variáveis de ambiente:
 - DatabaseName
 - DatabaseUser
 - DatabasePassword
+- AdminUser
+- AdminPassword
 
 Caso deseje utilizar [Google Authentication](https://developers.google.com/identity/oauth2/web/guides/overview), configure os seguinte [user secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=linux#enable-secret-storage):
 
 - Authentication:Google:ClientId
 - Authentication:Google:ClientSecret
+
+Você pode usar o arquivo [.env.example](./.env.example) como modelo para criação do arquivo .env.
 
 ```bash
 # Clone este repositório
@@ -84,11 +79,17 @@ Um exemplo de deploy em Azure App Services poder ser encontrado em:
 
 ### Funcionalidades
 
+#### Qualquer pessoa
 - Cadastro de usuário
 - Google Login
+
+#### Usuários aprovados
+- Cadastro de casos
+
+#### Gestores
 - Cadastro de categorias de um caso
 - Cadastro de itens de uma categoria
-- Cadastro de casos
+- Exportar casos ativos
 - Cadastro de ciclos em violação
 - Cadastro de violências sofridas
 - Cadastro de situação das violências

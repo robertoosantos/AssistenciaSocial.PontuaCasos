@@ -53,6 +53,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return View(historico);
         }
 
+        [HttpGet]
+        public IActionResult Export()
+        {
+            return File(_servicoDeCasos.ExportarAtivos(), "text/csv", "example.csv");
+        }
+
         // GET: Casos/Details/5
         public async Task<IActionResult> Details(int? id, string? modificado_em)
         {
@@ -250,11 +256,11 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         private void PreencherItensFamiliares(Caso caso)
         {
             // Exemplo: a chave no form pode ser algo como "itens_123".
-            foreach (var par in Request.Form.Where(f => f.Value.Any(v => v.Contains("itens_"))))
+            foreach (var par in Request.Form.Where(f => f.Value.Any(v => v != null && v.Contains("itens_"))))
             {
                 foreach (var valor in par.Value)
                 {
-                    if (valor.StartsWith("itens_"))
+                    if (valor != null && valor.StartsWith("itens_"))
                     {
                         if (int.TryParse(valor.Replace("itens_", ""), out var idItem))
                         {

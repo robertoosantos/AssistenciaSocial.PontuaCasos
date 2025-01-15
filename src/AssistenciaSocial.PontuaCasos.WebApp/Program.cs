@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 builder.Services.AddDbContext<PontuaCasosContext>(options =>
-    options.UseSqlServer($"Server={builder.Configuration["DatabaseServer"]};Database={builder.Configuration["DatabaseName"]};User Id={builder.Configuration["DatabaseUser"]};Password={builder.Configuration["DatabasePassword"]};"));
+    options.UseSqlServer($"Server={builder.Configuration["DatabaseServer"]};Database={builder.Configuration["DatabaseName"]};User Id={builder.Configuration["DatabaseUser"]};Password={builder.Configuration["DatabasePassword"]};Encrypt=True;TrustServerCertificate=True;"));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -28,8 +28,8 @@ if (builder.Configuration["Authentication:Google:ClientId"] != null && builder.C
 {
     builder.Services.AddAuthentication().AddGoogle(googleOptions =>
     {
-        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
     });
 }
 
@@ -72,7 +72,9 @@ app.MapRazorPages();
 /// Data Seeding dos perfis base da aplicação
 using (var scope = app.Services.CreateScope())
 {
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
 
     var roles = new[] { "Administradores", "Usuários", "Gestores" };
 
@@ -83,6 +85,22 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
+
+    // Seed admin user
+    var adminEmail = configuration["AdminUser"] ?? "";
+    var adminPassword = configuration["AdminPassword"] ?? "";
+
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var adminUser = new Usuario { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Administradores");
+        }
+    }
+
 }
 
 app.Run();

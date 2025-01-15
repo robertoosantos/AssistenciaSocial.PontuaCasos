@@ -20,9 +20,9 @@ public class ListaCasosViewModel
     public DateTime CriadoEm { get; set; }
     public string CriadoPorId { get; set; } = null!;
     [DisplayName("Criado Por")]
-    public string CriadoPor { get; set; } = null!;
+    public string CriadoPor { get; set; } = "Usuário Desconhecido";
     [DisplayName("Modificado Em")]
     public DateTime ModificadoEm { get; set; }
     [DisplayName("Modificado Por")]
-    public string ModificadoPor { get; set; } = null!;
+    public string ModificadoPor { get; set; } = "Usuário Desconhecido";
 }

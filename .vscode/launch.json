@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/AssistenciaSocial.PontuaCasos.WebApp/bin/Debug/net6.0/AssistenciaSocial.PontuaCasos.WebApp.dll",
+            "program": "${workspaceFolder}/src/AssistenciaSocial.PontuaCasos.WebApp/bin/Debug/net8.0/AssistenciaSocial.PontuaCasos.WebApp.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/AssistenciaSocial.PontuaCasos.WebApp",
             "stopAtEntry": false,

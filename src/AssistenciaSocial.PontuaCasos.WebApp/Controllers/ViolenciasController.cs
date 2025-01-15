@@ -40,20 +40,23 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             if (individuo.Caso == null)
             {
                 ViewData["Erro"] = "Não é possível criar um indivíduo sem um caso associado.";
-                return View(_item.ConsultarViolencias());  
+                return View(_item.ConsultarViolencias());
             }
 
             var user = _context.Users
                 .Include(u => u.Organizacoes)
                 .First(u => User.Identity != null && u.Email == User.Identity!.Name);
 
-            var idViolencia = int.Parse(Request.Form[Item.ITENS_VIOLENCIAS][0]);
-            var idSituacao = int.Parse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][0]);
+            var idViolencia = 0;
+            int.TryParse(Request.Form[Item.ITENS_VIOLENCIAS][0], out idViolencia);
+
+            var idSituacao = 0;
+            int.TryParse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][0], out idSituacao);
 
             if (idViolencia == 0)
             {
                 ViewData["Erro"] = "Selecione uma violência.";
-                return View(_item.ConsultarViolencias());   
+                return View(_item.ConsultarViolencias());
             }
 
             var violencia = _context.Itens.Include(i => i.Categoria).First(i => i.Id == idViolencia);
@@ -105,7 +108,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
                 .Include(vs => vs.IndividuoEmViolacao)
                 .Include(vs => vs.Violencia)
                 .FirstOrDefaultAsync(m => m.Id == id);
-                
+
             if (item == null)
             {
                 return NotFound();

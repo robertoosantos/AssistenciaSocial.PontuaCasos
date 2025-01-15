@@ -13,7 +13,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
         public ItensFamiliares(PontuaCasosContext context)
         {
             _context = context;
-            _item = new ItemService(context);  
+            _item = new ItemService(context);
         }
 
         // GET: Itens/Details/5
@@ -101,7 +101,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             for (int i = 0; i < Request.Form[Item.ITENS_VIOLENCIAS].Count; i++)
             {
-                var idViolencia = int.Parse(Request.Form[Item.ITENS_VIOLENCIAS][i]);
+                var idViolencia = 0;
+                int.TryParse(Request.Form[Item.ITENS_VIOLENCIAS][i], out idViolencia);
 
                 if (idViolencia == 0 || idViolencia == int.MaxValue)
                 {
@@ -114,19 +115,24 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
 
             for (int i = 0; i < Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS].Count; i++)
             {
-                var idSituacao = int.Parse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][i]);
+                var idSituacao = 0;
+                int.TryParse(Request.Form[Item.ITENS_SITUACAO_VIOLENCIAS][i], out idSituacao);
 
                 if (idSituacao != 0 && idSituacao != int.MaxValue)
                 {
                     individuoDb.ViolenciasSofridas![i].SituacaoId = idSituacao;
-                } else {
+                }
+                else
+                {
                     individuoDb.ViolenciasSofridas![i].SituacaoId = null;
                 }
             }
- 
+
             for (int i = 0; i < Request.Form[Item.ITENS_SAUDE].Count; i++)
             {
-                var idSaude = int.Parse(Request.Form[Item.ITENS_SAUDE][i]);
+                var idSaude = 0;
+                int.TryParse(Request.Form[Item.ITENS_SAUDE][i], out idSaude);
+                
                 var saude = await _context.Itens.FirstAsync(s => s.Id == idSaude);
 
                 individuoDb.SituacoesDeSaude![i] = saude;
@@ -142,7 +148,7 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             {
                 _context.Update(individuoDb);
                 await _context.SaveChangesAsync();
-            }   
+            }
             catch (Exception)
             {
                 if (!IndividuoExists(individuo.Id))
