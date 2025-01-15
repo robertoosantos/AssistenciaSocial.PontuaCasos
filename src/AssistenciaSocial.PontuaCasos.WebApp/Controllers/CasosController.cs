@@ -53,6 +53,12 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Controllers
             return View(historico);
         }
 
+        [HttpGet]
+        public IActionResult Export()
+        {
+            return File(_servicoDeCasos.ExportarAtivos(), "text/csv", "example.csv");
+        }
+
         // GET: Casos/Details/5
         public async Task<IActionResult> Details(int? id, string? modificado_em)
         {

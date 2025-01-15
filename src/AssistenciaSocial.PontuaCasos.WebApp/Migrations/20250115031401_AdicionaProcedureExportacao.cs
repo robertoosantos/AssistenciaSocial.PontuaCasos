@@ -26,7 +26,6 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                     -- Passo 2: Construir o SQL dinâmico
                     SET @sql = '
                     SELECT
-                        c.Id,
                         c.ResponsavelFamiliar,
                         c.Titulo,
                         c.Prontuario,

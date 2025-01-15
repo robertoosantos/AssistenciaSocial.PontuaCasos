@@ -11,17 +11,18 @@
     <a asp-action="Create" class="btn btn-primary">Registrar Novo Caso</a>
 </p>
 <div class="d-flex justify-content-end">
+    <a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info ms-2">Meus Casos Ativos</a>
+    <a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info ms-2">Meus Casos Inativos</a>
     @if (User.IsInRole(AssistenciaSocial.PontuaCasos.WebApp.Models.Perfil.PERFIL_GESTORES))
     {
         <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
+        <a asp-action="Export" class="btn btn-outline-warning ms-2">Exportar Casos Ativos</a>
+        <form class="d-flex ms-2" method="get" action="@Url.Action("Index", "Casos")">
+            <input type="text" name="busca" class="form-control me-2" placeholder="Buscar casos..."
+                value="@ViewData["busca"]" />
+            <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+        </form>
     }
-    <a asp-action="Index" asp-route-filtro="ativos" class="btn btn-outline-info ms-2">Meus Casos Ativos</a>
-    <a asp-action="Index" asp-route-filtro="inativos" class="btn btn-outline-info ms-2">Meus Casos Inativos</a>
-    <form class="d-flex ms-2" method="get" action="@Url.Action("Index", "Casos")">
-        <input type="text" name="busca" class="form-control me-2" placeholder="Buscar casos..."
-            value="@ViewData["busca"]" />
-        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
-    </form>
 </div>
 
 <table class="table">
@@ -120,10 +121,12 @@
     @if (Model.TemPaginaAnterior)
         {
             <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina - 1)"
-                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">Anterior</a>
+                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]"
+                asp-route-busca="@ViewData["busca"]">Anterior</a>
         }
 
-        @for (int i = Model.Pagina <= 3 ? 1 : Model.Pagina - 3; Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3 && i <= Model.TotalPaginas; i++)
+        @for (int i = Model.Pagina <= 3 ? 1 : Model.Pagina - 3; Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3 && i <=
+       Model.TotalPaginas; i++)
         {
             if (i == Model.Pagina)
             {
@@ -139,7 +142,8 @@
         @if (Model.TemProximaPagina)
         {
             <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina + 1)"
-                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]" asp-route-busca="@ViewData["busca"]">Próxima</a>
+                asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]"
+                asp-route-busca="@ViewData["busca"]">Próxima</a>
         }
         <span class="ms-5">
             Itens por página:

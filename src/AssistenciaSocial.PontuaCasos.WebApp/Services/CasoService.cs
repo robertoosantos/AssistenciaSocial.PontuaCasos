@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using AssistenciaSocial.PontuaCasos.WebApp.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Data.Common;
+using System.Data;
 
 namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
 {
@@ -237,6 +241,55 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
                 }
             }
             caso.Categorias = categorias.Values.ToList();
+        }
+
+        internal byte[] ExportarAtivos()
+        {
+            // Example CSV content
+            var csvData = new StringBuilder();
+
+            using (var connection = _context.Database.GetDbConnection())
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters
+                    command.CommandText = "ExportarCasos";
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        DataTable? schemaTable = reader.GetSchemaTable();
+
+                        if (schemaTable != null)
+                        {
+                            var linha = new StringBuilder();
+                            foreach (DataRow row in schemaTable.Rows)
+                                linha.AppendFormat("{0};", row["ColumnName"]);
+
+                            csvData.AppendLine(linha.ToString());
+                        }
+
+                        while (reader.Read())
+                        {
+                            var linha = new StringBuilder();
+
+                            for (int i = 0; i < reader.FieldCount; i++)
+                                linha.AppendFormat("{0};", reader[i]);
+
+                            csvData.AppendLine(linha.ToString());
+                        }
+                    }
+                }
+            }
+
+            // Convert to byte array
+            var bytes = Encoding.UTF8.GetBytes(csvData.ToString());
+
+            // Return the file
+            return bytes;
         }
 
         #endregion

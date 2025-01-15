@@ -79,11 +79,17 @@ Um exemplo de deploy em Azure App Services poder ser encontrado em:
 
 ### Funcionalidades
 
+#### Qualquer pessoa
 - Cadastro de usuário
 - Google Login
+
+#### Usuários aprovados
+- Cadastro de casos
+
+#### Gestores
 - Cadastro de categorias de um caso
 - Cadastro de itens de uma categoria
-- Cadastro de casos
+- Exportar casos ativos
 - Cadastro de ciclos em violação
 - Cadastro de violências sofridas
 - Cadastro de situação das violências
