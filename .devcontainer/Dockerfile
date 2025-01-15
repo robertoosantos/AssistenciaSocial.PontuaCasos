@@ -15,6 +15,8 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
+ENV PATH="$PATH:/root/.dotnet/tools"
+
 # dotnet tools
 RUN dotnet tool install -g dotnet-ef --version 8.0.11
 RUN dotnet tool install -g dotnet-aspnet-codegenerator --version 8.0.11

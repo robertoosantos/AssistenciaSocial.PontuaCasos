@@ -72,7 +72,9 @@ app.MapRazorPages();
 /// Data Seeding dos perfis base da aplicação
 using (var scope = app.Services.CreateScope())
 {
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
 
     var roles = new[] { "Administradores", "Usuários", "Gestores" };
 
@@ -83,6 +85,22 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
         }
     }
+
+    // Seed admin user
+    var adminEmail = configuration["AdminUser"] ?? "";
+    var adminPassword = configuration["AdminPassword"] ?? "";
+
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var adminUser = new Usuario { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(adminUser, "Administradores");
+        }
+    }
+
 }
 
 app.Run();
