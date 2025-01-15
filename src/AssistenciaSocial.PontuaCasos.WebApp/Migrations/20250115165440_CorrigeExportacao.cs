@@ -5,14 +5,14 @@
 namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
 {
     /// <inheritdoc />
-    public partial class AdicionaProcedureExportacao : Migration
+    public partial class CorrigeExportacao : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
                 EXEC (N'
-                    CREATE PROCEDURE ExportarCasos
+                    CREATE OR ALTER PROCEDURE ExportarCasos
                     AS
                     BEGIN
                         DECLARE @colunas NVARCHAR(MAX);
@@ -21,7 +21,8 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
                         SELECT @colunas = STRING_AGG(QUOTENAME(Titulo), '','')
                         FROM (SELECT DISTINCT Titulo
                             FROM Itens
-                            WHERE ECategoria = 0) AS DistinctTitles;
+                            WHERE ECategoria = 0 
+                            AND Ativo = 1) AS DistinctTitles;
 
                         SET @sql = N''
                         SELECT
