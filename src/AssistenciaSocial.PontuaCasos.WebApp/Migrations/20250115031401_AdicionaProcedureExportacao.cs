@@ -11,107 +11,109 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-                CREATE PROCEDURE ExportarCasos
-                AS
-                BEGIN
-                    DECLARE @colunas NVARCHAR(MAX);
-                    DECLARE @sql NVARCHAR(MAX);
+                EXEC ('
+                    CREATE PROCEDURE ExportarCasos
+                    AS
+                    BEGIN
+                        DECLARE @colunas NVARCHAR(MAX);
+                        DECLARE @sql NVARCHAR(MAX);
 
-                    -- Passo 1: Obter os valores únicos da coluna Título
-                    SELECT @colunas = STRING_AGG(QUOTENAME(Titulo), ',')
-                    FROM (SELECT DISTINCT Titulo
-                        FROM Itens
-                        WHERE ECategoria = 0) AS DistinctTitles;
+                        -- Passo 1: Obter os valores únicos da coluna Título
+                        SELECT @colunas = STRING_AGG(QUOTENAME(Titulo), '','')
+                        FROM (SELECT DISTINCT Titulo
+                            FROM Itens
+                            WHERE ECategoria = 0) AS DistinctTitles;
 
-                    -- Passo 2: Construir o SQL dinâmico
-                    SET @sql = '
-                    SELECT
-                        c.ResponsavelFamiliar,
-                        c.Titulo,
-                        c.Prontuario,
-                        p.*
-                    FROM
-                        Casos c
-                        INNER JOIN
-                        (
-                    SELECT *
-                        FROM (
-                                SELECT
-                                    i.Titulo,
-                                    i.Pontos * c.Pontos Pontos,
-                                    iev.CasoId
-                                FROM IndividuosEmViolacoes iev
-                                    INNER JOIN Itens i
-                                    ON i.Id = iev.ItemId
-                                    INNER JOIN Itens c
-                                    ON c.Id = i.CategoriaId
+                        -- Passo 2: Construir o SQL dinâmico
+                        SET @sql = ''
+                        SELECT
+                            c.ResponsavelFamiliar,
+                            c.Titulo,
+                            c.Prontuario,
+                            p.*
+                        FROM
+                            Casos c
+                            INNER JOIN
+                            (
+                        SELECT *
+                            FROM (
+                                    SELECT
+                                        i.Titulo,
+                                        i.Pontos * c.Pontos Pontos,
+                                        iev.CasoId
+                                    FROM IndividuosEmViolacoes iev
+                                        INNER JOIN Itens i
+                                        ON i.Id = iev.ItemId
+                                        INNER JOIN Itens c
+                                        ON c.Id = i.CategoriaId
 
-                            UNION ALL
+                                UNION ALL
 
-                                SELECT
-                                    i.Titulo,
-                                    i.Pontos * c.Pontos Pontos,
-                                    ifa.CasoId
-                                FROM ItensFamiliares ifa
-                                    INNER JOIN Itens i
-                                    ON i.Id = ifa.ItemFamiliarId
-                                    INNER JOIN Itens c
-                                    ON c.Id = i.CategoriaId
+                                    SELECT
+                                        i.Titulo,
+                                        i.Pontos * c.Pontos Pontos,
+                                        ifa.CasoId
+                                    FROM ItensFamiliares ifa
+                                        INNER JOIN Itens i
+                                        ON i.Id = ifa.ItemFamiliarId
+                                        INNER JOIN Itens c
+                                        ON c.Id = i.CategoriaId
 
-                            UNION ALL
+                                UNION ALL
 
-                                SELECT
-                                    i.Titulo,
-                                    i.Pontos * c.Pontos Pontos,
-                                    iev.CasoId
-                                FROM SaudeIndividuos si
-                                    INNER JOIN IndividuosEmViolacoes iev
-                                    ON iev.Id = si.IndividuoId
-                                    INNER JOIN Itens i
-                                    ON i.Id = si.ItemSaudeId
-                                    INNER JOIN Itens c
-                                    ON c.Id = i.CategoriaId
+                                    SELECT
+                                        i.Titulo,
+                                        i.Pontos * c.Pontos Pontos,
+                                        iev.CasoId
+                                    FROM SaudeIndividuos si
+                                        INNER JOIN IndividuosEmViolacoes iev
+                                        ON iev.Id = si.IndividuoId
+                                        INNER JOIN Itens i
+                                        ON i.Id = si.ItemSaudeId
+                                        INNER JOIN Itens c
+                                        ON c.Id = i.CategoriaId
 
-                            UNION ALL
+                                UNION ALL
 
-                                SELECT
-                                    i.Titulo,
-                                    i.Pontos * c.Pontos Pontos,
-                                    iev.CasoId
-                                FROM ViolenciasSofridas vs
-                                    INNER JOIN IndividuosEmViolacoes iev
-                                    ON iev.Id = vs.IndividuoEmViolacaoId
-                                    INNER JOIN Itens i
-                                    ON i.Id = vs.SituacaoId
-                                    INNER JOIN Itens c
-                                    ON c.Id = i.CategoriaId
+                                    SELECT
+                                        i.Titulo,
+                                        i.Pontos * c.Pontos Pontos,
+                                        iev.CasoId
+                                    FROM ViolenciasSofridas vs
+                                        INNER JOIN IndividuosEmViolacoes iev
+                                        ON iev.Id = vs.IndividuoEmViolacaoId
+                                        INNER JOIN Itens i
+                                        ON i.Id = vs.SituacaoId
+                                        INNER JOIN Itens c
+                                        ON c.Id = i.CategoriaId
 
-                            UNION ALL
+                                UNION ALL
 
-                                SELECT
-                                    i.Titulo,
-                                    i.Pontos * c.Pontos Pontos,
-                                    iev.CasoId
-                                FROM ViolenciasSofridas vs
-                                    INNER JOIN IndividuosEmViolacoes iev
-                                    ON iev.Id = vs.IndividuoEmViolacaoId
-                                    INNER JOIN Itens i
-                                    ON i.Id = vs.ViolenciaId
-                                    INNER JOIN Itens c
-                                    ON c.Id = i.CategoriaId
-                    ) AS SourceTable
-                    PIVOT (
-                        SUM(Pontos)
-                        FOR Titulo IN (' + @colunas + ')
-                    ) AS PivotTable) p
-                        ON p.CasoId = c.Id
-                    WHERE
-                        Ativo = 1
-                    ';
+                                    SELECT
+                                        i.Titulo,
+                                        i.Pontos * c.Pontos Pontos,
+                                        iev.CasoId
+                                    FROM ViolenciasSofridas vs
+                                        INNER JOIN IndividuosEmViolacoes iev
+                                        ON iev.Id = vs.IndividuoEmViolacaoId
+                                        INNER JOIN Itens i
+                                        ON i.Id = vs.ViolenciaId
+                                        INNER JOIN Itens c
+                                        ON c.Id = i.CategoriaId
+                        ) AS SourceTable
+                        PIVOT (
+                            SUM(Pontos)
+                            FOR Titulo IN ('' + @colunas + '')
+                        ) AS PivotTable) p
+                            ON p.CasoId = c.Id
+                        WHERE
+                            Ativo = 1
+                        '';
 
-                    -- Passo 3: Executar o SQL dinâmico
-                    EXEC sp_executesql @sql;
-                END
+                        -- Passo 3: Executar o SQL dinâmico
+                        EXEC sp_executesql @sql;
+                    END
+                ')
             ");
         }
 
