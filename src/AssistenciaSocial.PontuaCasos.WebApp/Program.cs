@@ -75,6 +75,7 @@ using (var scope = app.Services.CreateScope())
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
+    var context = scope.ServiceProvider.GetRequiredService<PontuaCasosContext>();
 
     var roles = new[] { "Administradores", "Usuários", "Gestores" };
 
@@ -86,13 +87,23 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    var organizacaoInicial = await context.Organizacoes.FirstOrDefaultAsync();
+    var novaOrganizacao = new Organizacao { Nome = "CREAS" };
+
+    if (organizacaoInicial == null)
+    {
+        context.Organizacoes.Add(novaOrganizacao);
+        await context.SaveChangesAsync();
+        organizacaoInicial = novaOrganizacao;
+    }
+
     // Seed admin user
     var adminEmail = configuration["AdminUser"] ?? "";
     var adminPassword = configuration["AdminPassword"] ?? "";
 
     if (await userManager.FindByEmailAsync(adminEmail) == null)
     {
-        var adminUser = new Usuario { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+        var adminUser = new Usuario { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true, Organizacoes = new List<Organizacao> { novaOrganizacao } };
         var result = await userManager.CreateAsync(adminUser, adminPassword);
 
         if (result.Succeeded)
