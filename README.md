@@ -33,7 +33,7 @@ Esta aplicação foi desenvolvida por [Roberto de Oliveira Santos](https://githu
 Antes de começar, você vai precisar ter instalado em sua máquina as seguintes ferramentas:
 
 * [Git](https://git-scm.com)
-* [.Net 6](https://learn.microsoft.com/pt-br/dotnet/)
+* [.Net 8](https://learn.microsoft.com/pt-br/dotnet/)
 * [SQL Server 2019](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads) (*Versão Express sugerida)
 * Um editor para trabalhar com o código como [VSCode](https://code.visualstudio.com/)
 

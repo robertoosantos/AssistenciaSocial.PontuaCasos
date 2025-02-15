@@ -125,8 +125,7 @@
                 asp-route-busca="@ViewData["busca"]">Anterior</a>
         }
 
-        @for (int i = Model.Pagina <= 3 ? 1 : Model.Pagina - 3; Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3 && i <=
-       Model.TotalPaginas; i++)
+        @for (int i = (Model.Pagina <= 3 ? 1 : Model.Pagina - 3); (Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3) && i <= Model.TotalPaginas; i++)
         {
             if (i == Model.Pagina)
             {
