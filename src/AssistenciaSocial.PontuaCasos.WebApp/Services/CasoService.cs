@@ -54,22 +54,19 @@ namespace AssistenciaSocial.PontuaCasos.WebApp.Servicos
                 throw new InvalidOperationException("Conjunto de entidades 'PontuaCasosContext.Casos' está nulo.");
 
             string? administrador = await (from ur in _context.UserRoles
-                                         join r in _context.Roles on ur.RoleId equals r.Id
-                                         where ur.UserId == idUsuario && r.Name == "Administradores"
-                                         select ur.UserId).FirstOrDefaultAsync();
+                                           join r in _context.Roles on ur.RoleId equals r.Id
+                                           where ur.UserId == idUsuario && r.Name == "Administradores"
+                                           select ur.UserId).FirstOrDefaultAsync();
 
             var consulta = BaseListaCasos();
 
-            consulta.Where(c => c.CriadoPorId == idUsuario || administrador != null);
+            if (administrador == null)
+                consulta = consulta.Where(c => c.CriadoPorId == idUsuario);
 
-            consulta = filtro switch
-            {
-                "ativos" => consulta
-                    .Where(c => c.Ativo),
-                "inativos" => consulta
-                    .Where(c => !c.Ativo),
-                _ => consulta
-            };
+            if (filtro == null || filtro == "ativos")
+                consulta = consulta.Where(c => c.Ativo);
+            else if (filtro == "inativos")
+                consulta = consulta.Where(c => !c.Ativo);
 
             if (!String.IsNullOrEmpty(busca))
                 consulta = consulta.Where(c => c.Titulo.Contains(busca) || c.ResponsavelFamiliar.Contains(busca) || (c.Prontuario != null && c.Prontuario.Contains(busca)));

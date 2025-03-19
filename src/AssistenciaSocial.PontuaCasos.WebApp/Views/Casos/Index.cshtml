@@ -17,12 +17,12 @@
     {
         <a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-info ms-2">Todos</a>
         <a asp-action="Export" class="btn btn-outline-warning ms-2">Exportar Casos Ativos</a>
-        <form class="d-flex ms-2" method="get" action="@Url.Action("Index", "Casos")">
-            <input type="text" name="busca" class="form-control me-2" placeholder="Buscar casos..."
-                value="@ViewData["busca"]" />
-            <button type="submit" class="btn btn-outline-secondary">Buscar</button>
-        </form>
     }
+    <form class="d-flex ms-2" method="get" action="@Url.Action("Index", "Casos")">
+        <input type="text" name="busca" class="form-control me-2" placeholder="Buscar casos..."
+            value="@ViewData["busca"]" />
+        <button type="submit" class="btn btn-outline-secondary">Buscar</button>
+    </form>
 </div>
 
 <table class="table">
@@ -116,16 +116,17 @@
 @if (Model.TotalPaginas > 1)
 {
     <div class="d-flex justify-content-end">
-    Página:
+        Página:
 
-    @if (Model.TemPaginaAnterior)
+        @if (Model.TemPaginaAnterior)
         {
             <a class="mx-1" asp-action="Index" asp-route-pagina="@(Model.Pagina - 1)"
                 asp-route-tamanhoPagina="@Model.TamanhoPagina" asp-route-filtro="@ViewData["filtro"]"
                 asp-route-busca="@ViewData["busca"]">Anterior</a>
         }
 
-        @for (int i = (Model.Pagina <= 3 ? 1 : Model.Pagina - 3); (Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3) && i <= Model.TotalPaginas; i++)
+        @for (int i = (Model.Pagina <= 3 ? 1 : Model.Pagina - 3); (Model.Pagina <= 3 ? i <= 6 : i <= Model.Pagina + 3) && i
+            <= Model.TotalPaginas; i++)
         {
             if (i == Model.Pagina)
             {
