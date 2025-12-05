@@ -1,6 +1,6 @@
 # Indicadores de Risco
 
-## Aplicação para desenvolvimento de indicadores de casos da assistência social.
+## Aplicação para gestão de casos da assistência social conforme sua criticidade.
 
 
 Tabela de conteúdos
